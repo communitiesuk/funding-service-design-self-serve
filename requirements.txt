@@ -12,8 +12,6 @@ blinker==1.8.2
     # via flask
 click==8.1.7
     # via flask
-debugpy==1.8.2
-    # via -r requirements.in
 flask==3.0.3
     # via
     #   flask-migrate
