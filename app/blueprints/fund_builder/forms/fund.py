@@ -7,7 +7,7 @@ from wtforms.validators import Length
 
 
 class FundForm(FlaskForm):
-    fund_id = HiddenField("Fund ID", validators=[DataRequired()])
+    fund_id = HiddenField("Fund ID")
     name_en = StringField("Name", validators=[DataRequired()])
     title_en = StringField("Title", validators=[DataRequired()])
     short_name = StringField("Short Name", validators=[DataRequired(), Length(max=6)])

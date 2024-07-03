@@ -8,8 +8,8 @@ from wtforms.validators import Length
 
 
 class RoundForm(FlaskForm):
-    round_id = HiddenField("Round ID", validators=[DataRequired()])
-    fund_id = HiddenField("Fund ID", validators=[DataRequired()])
+    round_id = HiddenField("Round ID")
+    fund_id = HiddenField("Fund ID")
     title_en = StringField("Title", validators=[DataRequired()])
     short_name = StringField("Short Name", validators=[DataRequired(), Length(max=6)])
     opens = DateTimeField("Opens")

@@ -1,4 +1,5 @@
 import uuid
+from dataclasses import dataclass
 from typing import List
 
 from flask_sqlalchemy.model import DefaultMeta
@@ -16,6 +17,7 @@ from .round import Round
 BaseModel: DefaultMeta = db.Model
 
 
+@dataclass
 class Fund(BaseModel):
     id = Column(
         "fund_id",

@@ -7,7 +7,7 @@ from app.app import app  # noqa:E402
 
 
 @task
-def recreate_local_db(c):
+def recreate_local_dbs(c):
     """Create a clean database for development.
 
     Unit testing makes a seperate db.
@@ -19,16 +19,19 @@ def recreate_local_db(c):
     from sqlalchemy_utils.functions import drop_database
 
     with app.app_context():
-        db_uri = app.config.get("SQLALCHEMY_DATABASE_URI")
-        if database_exists(db_uri):
-            print("Existing database found!\n")
-            drop_database(db_uri)
-            print("Existing database dropped!\n")
-        else:
+        for db_uri in [
+            "postgresql://postgres:password@fsd-self-serve-db:5432/fund_builder",  # pragma: allowlist secret
+            "postgresql://postgres:password@fsd-self-serve-db:5432/fund_builder_unit_test",  # pragma: allowlist secret
+        ]:
+            if database_exists(db_uri):
+                print("Existing database found!\n")
+                drop_database(db_uri)
+                print("Existing database dropped!\n")
+            else:
+                print(
+                    f"{db_uri} not found...",
+                )
+            create_database(db_uri)
             print(
-                f"{db_uri} not found...",
+                f"{db_uri} db created...",
             )
-        create_database(db_uri)
-        print(
-            f"{db_uri} db created...",
-        )

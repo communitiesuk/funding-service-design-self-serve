@@ -1,4 +1,5 @@
 import uuid
+from dataclasses import dataclass
 
 from flask_sqlalchemy.model import DefaultMeta
 from sqlalchemy import Column
@@ -14,6 +15,7 @@ from app.db import db
 BaseModel: DefaultMeta = db.Model
 
 
+@dataclass
 class Round(BaseModel):
     __table_args__ = (UniqueConstraint("fund_id", "short_name"),)
     id = Column(

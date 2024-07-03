@@ -1,7 +1,7 @@
 from invoke import task
 
-from tasks.db_tasks import recreate_local_db
+from tasks.db_tasks import recreate_local_dbs
 
 task.auto_dash_names = True
 
-__all__ = [recreate_local_db]
+__all__ = [recreate_local_dbs]
