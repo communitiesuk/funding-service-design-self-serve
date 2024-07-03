@@ -94,13 +94,13 @@ COMPONENTS = [
         "conditions": [
             {
                 "name": "organisation_other_names_no",
-                "value": "False",
+                "value": "false",
                 "operator": "is",
                 "destination_page": "CONTINUE",
             },
             {
                 "name": "organisation_other_names_yes",
-                "value": "True",
+                "value": "true",
                 "operator": "is",
                 "destination_page": "alternative-organisation-name",
             },
