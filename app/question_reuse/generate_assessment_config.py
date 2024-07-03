@@ -3,9 +3,9 @@ import json
 import os
 
 import click
+
 from app.question_reuse.config.lookups import LOOKUPS
 from app.question_reuse.config.themes_to_reuse import THEMES_TO_REUSE
-
 
 BASIC_SECTION_STRUCTURE = {"id": None, "name": None, "sub_criteria": []}
 
@@ -42,9 +42,7 @@ def generate_field_info_from_forms(forms_dir: str) -> dict:
     for file_name in os.listdir(forms_dir):
         with open(os.path.join(forms_dir, file_name), "r") as f:
             form_data = json.load(f)
-            results.update(
-                build_answers_from_form(form_data, file_name.split(".")[0])
-            )
+            results.update(build_answers_from_form(form_data, file_name.split(".")[0]))
 
     return results
 
@@ -77,9 +75,7 @@ def build_answers_from_form(form_data: dict, form_name: str) -> dict:
                 "field_id": component["name"],
                 "form_name": form_name,
                 "field_type": component["type"],
-                "presentation_type": form_json_to_assessment_display_types.get(
-                    component["type"].lower(), None
-                ),
+                "presentation_type": form_json_to_assessment_display_types.get(component["type"].lower(), None),
                 "question": question,
             }
 
@@ -99,9 +95,7 @@ def build_theme(theme_id: str, field_info: dict) -> dict:
     result = copy.deepcopy(BASIC_THEME_STRUCTURE)
     result.update({"id": theme_id, "name": LOOKUPS[theme_id]})
     for answer in THEMES_TO_REUSE[theme_id]["answers"]:
-        result["answers"].append(
-            field_info.get(answer, None)
-        )
+        result["answers"].append(field_info.get(answer, None))
 
     return result
 
@@ -117,16 +111,14 @@ def build_sub_criteria(sub_criteria: dict, field_info: dict) -> dict:
         dict: Dictionary of subcriteria IDs to their config (containing themes)
     """
     result = copy.deepcopy(BASIC_SUB_CRITERIA_STRUCTURE)
-    result.update(
-        {"id": sub_criteria["id"], "name": LOOKUPS[sub_criteria["id"]]}
-    )
+    result.update({"id": sub_criteria["id"], "name": LOOKUPS[sub_criteria["id"]]})
     for theme in sub_criteria["themes"]:
         result["themes"].append(build_theme(theme, field_info))
     return result
 
 
 def build_assessment_config(input_data: dict, field_info: dict) -> dict:
-    """Builds a dictionary represting the full assessment config based on the input data 
+    """Builds a dictionary represting the full assessment config based on the input data
 
     Args:
         input_data (dict): Dictionary of input data (eg. test_data/in/ns_unscored.json)
@@ -142,14 +134,10 @@ def build_assessment_config(input_data: dict, field_info: dict) -> dict:
         for section in value:
             # id = 'unscored' or 'declarations'
             assessment_section = copy.deepcopy(BASIC_SECTION_STRUCTURE)
-            assessment_section.update(
-                {"id": section["id"], "name": LOOKUPS[section["id"]]}
-            )
+            assessment_section.update({"id": section["id"], "name": LOOKUPS[section["id"]]})
 
             for sc in section["subcriteria"]:
-                assessment_section["sub_criteria"].append(
-                    build_sub_criteria(sc, field_info)
-                )
+                assessment_section["sub_criteria"].append(build_sub_criteria(sc, field_info))
 
             assessment_sections.append(assessment_section)
         results[key] = assessment_sections

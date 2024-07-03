@@ -1,4 +1,8 @@
-from app.data.not_a_db import COMPONENTS, PAGES, LISTS, FORMS, SECTIONS
+from app.data.not_a_db import COMPONENTS
+from app.data.not_a_db import FORMS
+from app.data.not_a_db import LISTS
+from app.data.not_a_db import PAGES
+from app.data.not_a_db import SECTIONS
 
 saved_responses = []
 saved_sections = {}
@@ -15,6 +19,7 @@ def get_saved_forms():
 def get_all_sections():
     return SECTIONS
 
+
 # def clear_saved_forms():
 #     saved_forms = {}
 #     return
@@ -30,8 +35,7 @@ def get_responses() -> list:
 
 
 def clear_all_responses():
-    responses = []
-    return
+    saved_responses.clear()
 
 
 def get_all_components() -> list:
@@ -77,5 +81,5 @@ def save_question(question: dict):
     )
 
 
-def save_section(section:dict):
+def save_section(section: dict):
     SECTIONS.append(section)

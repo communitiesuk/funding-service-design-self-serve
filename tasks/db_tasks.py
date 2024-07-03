@@ -1,10 +1,9 @@
-
-
 import sys
 
 sys.path.insert(1, ".")
-from invoke import task
-from app.app import app
+from invoke import task  # noqa:E402
+
+from app.app import app  # noqa:E402
 
 
 @task
@@ -16,7 +15,8 @@ def recreate_local_db(c):
     """
 
     from sqlalchemy_utils.functions import create_database
-    from sqlalchemy_utils.functions import database_exists, drop_database
+    from sqlalchemy_utils.functions import database_exists
+    from sqlalchemy_utils.functions import drop_database
 
     with app.app_context():
         db_uri = app.config.get("SQLALCHEMY_DATABASE_URI")

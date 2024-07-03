@@ -120,7 +120,10 @@ COMPONENTS = [
                     "options": {"classes": "govuk-!-width-full"},
                     "type": "WebsiteField",
                     "title": "Link",
-                    "hint": "<p>For example, your company's Facebook, Instagram or Twitter accounts (if applicable)</p><p>You can add more links on the next step</p>",
+                    "hint": (
+                        "<p>For example, your company's Facebook, Instagram or Twitter accounts (if"
+                        " applicable)</p><p>You can add more links on the next step</p>"
+                    ),
                     "schema": {},
                 }
             ],
@@ -190,7 +193,11 @@ COMPONENTS = [
             "options": {},
             "type": "YesNoField",
             "title": "Is the lead contact the same person as the authorised signatory?",
-            "hint": '<p class=\\"govuk-hint\\">An authorised signatory:<ul class=\\"govuk-list govuk-list--bullet govuk-hint\\"> <li>is allowed to act on behalf of the organisation</li> <li>will sign the grant funding agreement if your application is successful</li></ul></p>',
+            "hint": (
+                '<p class=\\"govuk-hint\\">An authorised signatory:<ul class=\\"govuk-list govuk-list--bullet'
+                ' govuk-hint\\"> <li>is allowed to act on behalf of the organisation</li> <li>will sign the grant'
+                " funding agreement if your application is successful</li></ul></p>"
+            ),
         },
         "conditions": [
             {
@@ -213,7 +220,11 @@ COMPONENTS = [
         "json_snippet": {
             "options": {},
             "type": "Html",
-            "content": '<p class=\\"govuk-hint\\">An authorised signatory:</p>\\n<ul class=\\"govuk-list govuk-list--bullet govuk-hint\\">\\n            <li>is allowed to act on behalf of the organisation</li>\\n            <li>will sign the grant funding agreement if your application is successful</li>\\n          </ul>',
+            "content": (
+                '<p class=\\"govuk-hint\\">An authorised signatory:</p>\\n<ul class=\\"govuk-list govuk-list--bullet'
+                ' govuk-hint\\">\\n            <li>is allowed to act on behalf of the organisation</li>\\n           '
+                " <li>will sign the grant funding agreement if your application is successful</li>\\n          </ul>"
+            ),
             "schema": {},
             "title": None,
         },
@@ -408,8 +419,8 @@ LISTS = {
         ],
     }
 }
-FORMS=[
-      {
+FORMS = [
+    {
         "id": "org-info",
         "builder_display_name": "Organisation Information (Simple)",
         "form_display_name": "Organisation Information",
@@ -418,5 +429,5 @@ FORMS=[
             "organisation-single-name",
             "organisation-address",
         ],
-    },  
+    },
 ]

@@ -1,29 +1,40 @@
-from flask import Flask
-
-from jinja2 import PackageLoader, ChoiceLoader
-from flask_assets import Bundle
-from jinja2 import PrefixLoader
-from app.blueprints.self_serve.routes import self_serve_bp
-from app.blueprints.dev.routes import dev_bp
-from flask_assets import Environment
 from os import getenv
+
+from flask import Flask
+from flask_assets import Environment
+from jinja2 import ChoiceLoader
+from jinja2 import PackageLoader
+from jinja2 import PrefixLoader
+
 import static_assets
-from app.db.models import Fund, Round
+from app.blueprints.dev.routes import dev_bp
+from app.blueprints.fund_builder.routes import build_fund_bp
+from app.blueprints.self_serve.routes import self_serve_bp
+from app.db.models import Fund  # noqa:F401
+from app.db.models import Round  # noqa:F401
+
 
 def create_app() -> Flask:
 
     flask_app = Flask("__name__", static_url_path="/assets")
-    flask_app.secret_key="dev"
+    flask_app.secret_key = "dev"  # pragma: allowlist secret
     flask_app.register_blueprint(self_serve_bp)
     flask_app.register_blueprint(dev_bp)
+    flask_app.register_blueprint(build_fund_bp)
 
-    flask_app.config.from_mapping({
-        "SQLALCHEMY_DATABASE_URI": getenv("DATABASE_URL", "postgresql://postgres:password@fsd-self-serve-db:5432/fund_builder")
-    })
+    flask_app.config.from_mapping(
+        {
+            "SQLALCHEMY_DATABASE_URI": getenv(
+                "DATABASE_URL",
+                "postgresql://postgres:password@fsd-self-serve-db:5432/fund_builder",  # pragma: allowlist secret
+            )
+        }
+    )
 
     flask_app.static_folder = "app/static/dist"
 
-    from app.db import db, migrate
+    from app.db import db
+    from app.db import migrate
 
     # Bind SQLAlchemy ORM to Flask app
     db.init_app(flask_app)
@@ -54,7 +65,7 @@ def create_app() -> Flask:
         ]
     )
 
-
     return flask_app
+
 
 app = create_app()

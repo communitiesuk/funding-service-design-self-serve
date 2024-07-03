@@ -1,6 +1,9 @@
-from app.question_reuse.generate_form import build_lists, build_page, build_conditions, build_navigation
 import pytest
 
+from app.question_reuse.generate_form import build_conditions
+from app.question_reuse.generate_form import build_lists
+from app.question_reuse.generate_form import build_navigation
+from app.question_reuse.generate_form import build_page
 
 LIST1 = {
     "type": "string",

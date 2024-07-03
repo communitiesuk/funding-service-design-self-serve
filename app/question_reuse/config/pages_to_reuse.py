@@ -36,9 +36,7 @@ PAGES_TO_REUSE = {
             "reuse-annual-turnover-23",
         ]
     },
-    "ns-membership-organisations": {
-        "component_names": ["ns-membership-organisations"]
-    },
+    "ns-membership-organisations": {"component_names": ["ns-membership-organisations"]},
     "lead-contact-details-and-auth-signatory": {
         "component_names": [
             "reuse-lead-contact-name",

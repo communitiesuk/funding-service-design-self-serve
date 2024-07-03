@@ -1,4 +1,5 @@
 import pytest
+
 from app.question_reuse.generate_form import build_form_json
 
 
@@ -149,7 +150,11 @@ from app.question_reuse.generate_form import build_form_json
                                 "options": {},
                                 "type": "YesNoField",
                                 "title": "Is the lead contact the same person as the authorised signatory?",
-                                "hint": "<p class='govuk-hint'>An authorised signatory:<ul class='govuk-list govuk-list--bullet govuk-hint'> <li>is allowed to act on behalf of the organisation</li> <li>will sign the grant funding agreement if your application is successful</li></ul></p>",
+                                "hint": "<p class='govuk-hint'>An authorised signatory:"
+                                "<ul class='govuk-list govuk-list--bullet govuk-hint'> <li>is allowed to act on behalf"
+                                " of the organisation</li> "
+                                "<li>will sign the grant funding agreement if your application is "
+                                "successful</li></ul></p>",
                                 "name": "reuse_is_lead_contact_same_as_auth_signatory",
                             },
                         ],
@@ -207,7 +212,10 @@ from app.question_reuse.generate_form import build_form_json
                                 "name": "xKWJWW",
                                 "options": {},
                                 "type": "Html",
-                                "content": "<p class='govuk-hint'>An authorised signatory:</p>\\n<ul class='govuk-list govuk-list--bullet govuk-hint'>\\n            <li>is allowed to act on behalf of the organisation</li>\\n            <li>will sign the grant funding agreement if your application is successful</li>\\n          </ul>",
+                                "content": "<p class='govuk-hint'>An authorised signatory:</p>\\n"
+                                "<ul class='govuk-list govuk-list--bullet govuk-hint'>\\n            <li>is allowed to"
+                                " act on behalf of the organisation</li>\\n            <li>will sign the grant "
+                                "funding agreement if your application is successful</li>\\n          </ul>",
                                 "schema": {},
                             },
                             {
@@ -425,7 +433,10 @@ from app.question_reuse.generate_form import build_form_json
                                 "options": {},
                                 "type": "YesNoField",
                                 "title": "Is the lead contact the same person as the authorised signatory?",
-                                "hint": "<p class='govuk-hint'>An authorised signatory:<ul class='govuk-list govuk-list--bullet govuk-hint'> <li>is allowed to act on behalf of the organisation</li> <li>will sign the grant funding agreement if your application is successful</li></ul></p>",
+                                "hint": "<p class='govuk-hint'>An authorised signatory:<ul class='govuk-list"
+                                " govuk-list--bullet govuk-hint'> <li>is allowed to act on behalf of the "
+                                "organisation</li> <li>will sign the grant funding agreement if your "
+                                "application is successful</li></ul></p>",
                                 "name": "reuse_is_lead_contact_same_as_auth_signatory",
                             },
                         ],
@@ -449,7 +460,10 @@ from app.question_reuse.generate_form import build_form_json
                                 "name": "xKWJWW",
                                 "options": {},
                                 "type": "Html",
-                                "content": "<p class='govuk-hint'>An authorised signatory:</p>\\n<ul class='govuk-list govuk-list--bullet govuk-hint'>\\n            <li>is allowed to act on behalf of the organisation</li>\\n            <li>will sign the grant funding agreement if your application is successful</li>\\n          </ul>",
+                                "content": "<p class='govuk-hint'>An authorised signatory:</p>\\n<ul class='govuk-list"
+                                " govuk-list--bullet govuk-hint'>\\n            <li>is allowed to act on behalf of "
+                                "the organisation</li>\\n            <li>will sign the grant funding agreement if "
+                                "your application is successful</li>\\n          </ul>",
                                 "schema": {},
                             },
                             {

@@ -1,11 +1,12 @@
 import copy
-import datetime
 import json
 import os
 
-from app.data.data_access import get_page_by_id, get_component_by_name, get_list_by_id
-
 import click
+
+from app.data.data_access import get_component_by_name
+from app.data.data_access import get_list_by_id
+from app.data.data_access import get_page_by_id
 
 BASIC_FORM_STRUCTURE = {
     "metadata": {},
@@ -169,9 +170,9 @@ def build_lists(pages: dict) -> dict:
 
 
 def build_start_page_content_component(content: str, pages) -> dict:
-    ask_about='<p class="govuk-body">We will ask you about:</p> <ul>'
+    ask_about = '<p class="govuk-body">We will ask you about:</p> <ul>'
     for page in pages:
-        ask_about+=f"<li>{page['title']}</li>"
+        ask_about += f"<li>{page['title']}</li>"
     ask_about += "</ul>"
 
     result = {
@@ -183,12 +184,12 @@ def build_start_page_content_component(content: str, pages) -> dict:
     }
     return result
 
+
 # title arg is used for title of first page in form
 def build_form_json(input_json: dict, form_title: str, form_id: str) -> dict:
 
     results = copy.deepcopy(BASIC_FORM_STRUCTURE)
     results["name"] = form_title
-
 
     for page in input_json["pages"]:
         results["pages"].append(build_page(page))

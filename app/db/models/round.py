@@ -1,15 +1,15 @@
-from app.db import db
-from flask_sqlalchemy.model import DefaultMeta
-
-from sqlalchemy import Column
-from sqlalchemy import UniqueConstraint
-from sqlalchemy.dialects.postgresql import UUID, JSON
-from sqlalchemy.orm import Mapped, relationship
 import uuid
-from sqlalchemy import ForeignKey
-from sqlalchemy.types import Boolean
+
+from flask_sqlalchemy.model import DefaultMeta
+from sqlalchemy import Column
 from sqlalchemy import DateTime
-from typing import List
+from sqlalchemy import ForeignKey
+from sqlalchemy import UniqueConstraint
+from sqlalchemy.dialects.postgresql import JSON
+from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy.types import Boolean
+
+from app.db import db
 
 BaseModel: DefaultMeta = db.Model
 

@@ -1,13 +1,16 @@
-from flask import Blueprint, redirect, url_for, current_app, request
-from app.data.data_access import (
-    get_responses,
-    clear_all_responses,
-    get_saved_forms,
-    save_response,
-    get_all_components,
-    get_all_pages,
-    get_all_sections,
-)
+from flask import Blueprint
+from flask import current_app
+from flask import redirect
+from flask import request
+from flask import url_for
+
+from app.data.data_access import clear_all_responses
+from app.data.data_access import get_all_components
+from app.data.data_access import get_all_pages
+from app.data.data_access import get_all_sections
+from app.data.data_access import get_responses
+from app.data.data_access import get_saved_forms
+from app.data.data_access import save_response
 
 dev_bp = Blueprint(
     "dev_bp",

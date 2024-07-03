@@ -82,10 +82,7 @@ COMPONENTS_TO_REUSE = {
         },
         "type": "NumberField",
         "title": "Annual turnover for 1 April 2022 to 31 March 2023",
-        "hint": (
-            '<label class="govuk-body" for="YauUjZ">1 April 2022 to 31 March'
-            " 2023</label>"
-        ),
+        "hint": ('<label class="govuk-body" for="YauUjZ">1 April 2022 to 31 March' " 2023</label>"),
     },
     "reuse-annual-turnover-22": {
         "options": {
@@ -94,19 +91,14 @@ COMPONENTS_TO_REUSE = {
             "classes": "govuk-input--width-10",
         },
         "type": "NumberField",
-        "hint": (
-            '<label class="govuk-body" for="zuCRBk">1 April 2021 to 31 March'
-            " 2022</label>"
-        ),
+        "hint": ('<label class="govuk-body" for="zuCRBk">1 April 2021 to 31 March' " 2022</label>"),
         "title": "Annual turnover for 1 April 2021 to 31 March 2022",
     },
     "reuse-lead-contact-name": {
         "options": {"classes": "govuk-!-width-full"},
         "type": "TextField",
         "title": "Name of lead contact",
-        "hint": (
-            "They will receive all the information about this application."
-        ),
+        "hint": ("They will receive all the information about this application."),
     },
     "reuse-lead-contact-job-title": {
         "options": {"classes": "govuk-!-width-full"},
@@ -126,9 +118,7 @@ COMPONENTS_TO_REUSE = {
     "reuse_is_lead_contact_same_as_auth_signatory": {
         "options": {},
         "type": "YesNoField",
-        "title": (
-            "Is the lead contact the same person as the authorised signatory?"
-        ),
+        "title": ("Is the lead contact the same person as the authorised signatory?"),
         "hint": (
             '<p class="govuk-hint">An authorised signatory:<ul'
             ' class="govuk-list govuk-list--bullet govuk-hint"> <li>is allowed'

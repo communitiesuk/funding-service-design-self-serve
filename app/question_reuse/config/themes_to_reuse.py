@@ -20,7 +20,7 @@ THEMES_TO_REUSE = {
             "reuse-charitable-objects",
             "reuse-annual-turnover-23",
             "reuse-annual-turnover-22",
-            "ns-membership-organisations"
+            "ns-membership-organisations",
         ]
     },
 }

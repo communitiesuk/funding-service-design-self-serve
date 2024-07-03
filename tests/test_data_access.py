@@ -1,11 +1,10 @@
-from app.data.data_access import (
-    get_all_pages,
-    get_list_by_id,
-    get_component_by_name,
-    get_pages_to_display_in_builder,
-    get_page_by_id,
-)
 import pytest
+
+from app.data.data_access import get_all_pages
+from app.data.data_access import get_component_by_name
+from app.data.data_access import get_list_by_id
+from app.data.data_access import get_page_by_id
+from app.data.data_access import get_pages_to_display_in_builder
 
 
 @pytest.mark.parametrize(
@@ -82,14 +81,14 @@ def test_get_all_pages_for_builder(mocker, all_pages, exp_length):
     assert len(results) == exp_length
 
 
-TEST_COMPONENTS = [{"id":"name1","a": "b"}, {"id":"name2"}]
+TEST_COMPONENTS = [{"id": "name1", "a": "b"}, {"id": "name2"}]
 
 
 @pytest.mark.parametrize(
     "all_components, name, exp_result",
     [
         ({}, "anything", None),
-        (TEST_COMPONENTS, "name1", {"a": "b", "id":"name1"}),
+        (TEST_COMPONENTS, "name1", {"a": "b", "id": "name1"}),
         (TEST_COMPONENTS, "not_in_list", None),
     ],
 )
