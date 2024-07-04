@@ -92,6 +92,7 @@ c4: Component = Component(
     page_index=1,
     theme_id=t2.theme_id,
     theme_index=1,
+    options={"hideTitle": False, "classes": ""},
 )
 c5: Component = Component(
     component_id=uuid4(),
@@ -101,6 +102,7 @@ c5: Component = Component(
     page_index=2,
     theme_id=t2.theme_id,
     theme_index=3,
+    options={"hideTitle": False, "classes": ""},
 )
 c6: Component = Component(
     component_id=uuid4(),
@@ -110,6 +112,7 @@ c6: Component = Component(
     page_index=3,
     theme_id=t2.theme_id,
     theme_index=2,
+    options={"hideTitle": False, "classes": ""},
 )
 c1: Component = Component(
     component_id=uuid4(),
@@ -120,6 +123,7 @@ c1: Component = Component(
     page_index=1,
     theme_id=t1.theme_id,
     theme_index=1,
+    options={"hideTitle": False, "classes": ""},
 )
 c3: Component = Component(
     component_id=uuid4(),
@@ -129,6 +133,7 @@ c3: Component = Component(
     page_index=2,
     theme_id=t1.theme_id,
     theme_index=2,
+    options={"hideTitle": False, "classes": ""},
 )
 c2: Component = Component(
     component_id=uuid4(),
@@ -139,6 +144,7 @@ c2: Component = Component(
     page_index=1,
     theme_id=t1.theme_id,
     theme_index=3,
+    options={"hideTitle": False, "classes": ""},
 )
 
 

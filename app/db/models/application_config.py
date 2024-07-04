@@ -119,6 +119,7 @@ class Component(BaseModel):
         ForeignKey("theme.theme_id"),
         nullable=True,  # will be null where this is a template and not linked to a theme
     )
+    # TODO make these 2 json so we can do welsh?
     title = Column(String())
     hint_text = Column(String(), nullable=True)
     options = Column(JSON(none_as_null=False))

@@ -4,9 +4,9 @@ import os
 
 import click
 
-from app.data.data_access import get_component_by_name
 from app.data.data_access import get_list_by_id
-from app.data.data_access import get_page_by_id
+from app.db.models import Form
+from app.db.models import Page
 
 BASIC_FORM_STRUCTURE = {
     "metadata": {},
@@ -80,32 +80,33 @@ def build_conditions(component_name, component: dict) -> list:
     return results
 
 
-def build_page(input_page_name: str) -> dict:
-    input_page = get_page_by_id(input_page_name)
-    page = copy.deepcopy(BASIC_PAGE_STRUCTURE)
-    page.update(
+def build_page(page: Page) -> dict:
+    built_page = copy.deepcopy(BASIC_PAGE_STRUCTURE)
+    built_page.update(
         {
-            "path": f"/{input_page_name}",
-            "title": input_page["form_display_name"],
+            "path": f"/{page.display_path}",
+            "title": page.name_in_apply["en"],
         }
     )
     # Having a 'null' controller element breaks the form-json, needs to not be there if blank
-    if controller := input_page.get("controller", None):
-        page["controller"] = controller
-    for component_name in input_page["component_names"]:
-        component = copy.deepcopy(get_component_by_name(component_name)["json_snippet"])
-        component["name"] = component_name
-        conditions = component.get("conditions", None)
-        if conditions:
-            component.pop("conditions")
+    # if controller := input_page.get("controller", None):
+    #     page["controller"] = controller
+    for component in page.components:
+        build_component = {
+            "options": component.options,
+            "type": component.type.value,
+            "title": component.title,
+            "hint": component.hint_text,
+            "schema": {},
+        }
 
-        page["components"].append(component)
+        built_page["components"].append(build_component)
 
-    return page
+    return built_page
 
 
 # Goes through the set of pages and updates the conditions and next properties to account for branching
-def build_navigation(partial_form_json: dict, input_pages: list[str]) -> dict:
+def build_navigation(partial_form_json: dict, input_pages: list[Page]) -> dict:
     for i in range(0, len(input_pages)):
         if i < len(input_pages) - 1:
             next_path = input_pages[i + 1]
@@ -114,40 +115,41 @@ def build_navigation(partial_form_json: dict, input_pages: list[str]) -> dict:
         else:
             next_path = None
 
-        this_path = input_pages[i]
-        this_page_in_results = next(p for p in partial_form_json["pages"] if p["path"] == f"/{this_path}")
+        this_page = input_pages[i]
+        this_page_in_results = next(p for p in partial_form_json["pages"] if p["path"] == f"/{this_page.display_path}")
 
         has_conditions = False
-        for c_name in get_page_by_id(this_path)["component_names"]:
-            component = get_component_by_name(c_name)
-            if "conditions" in component:
+        # TODO restore conditions
+        # for component in this_page.components:
+        # if "conditions" in component:
 
-                form_json_conditions = build_conditions(c_name, component)
-                has_conditions = True
-                partial_form_json["conditions"].extend(form_json_conditions)
-                for condition in component["conditions"]:
-                    if condition["destination_page"] == "CONTINUE":
-                        destination_path = f"/{next_path}"
-                    else:
-                        destination_path = f"/{condition['destination_page']}"
+        #     form_json_conditions = build_conditions(component.title, component)
+        #     has_conditions = True
+        #     partial_form_json["conditions"].extend(form_json_conditions)
 
-                    # If this points to a pre-built page flow, add that in now (it won't be in the input)
-                    if (
-                        destination_path not in [page["path"] for page in partial_form_json["pages"]]
-                        and not destination_path == "/summary"
-                    ):
-                        sub_page = build_page(destination_path[1:])
-                        if not sub_page.get("next", None):
-                            sub_page["next"] = [{"path": f"/{next_path}"}]
+        # for condition in component.conditions:
+        #     if condition["destination_page"] == "CONTINUE":
+        #         destination_path = f"/{next_path}"
+        #     else:
+        #         destination_path = f"/{condition['destination_page']}"
 
-                        partial_form_json["pages"].append(sub_page)
+        #     # If this points to a pre-built page flow, add that in now (it won't be in the input)
+        #     if (
+        #         destination_path not in [page["path"] for page in partial_form_json["pages"]]
+        #         and not destination_path == "/summary"
+        #     ):
+        #         sub_page = build_page(destination_path[1:])
+        #         if not sub_page.get("next", None):
+        #             sub_page["next"] = [{"path": f"/{next_path}"}]
 
-                    this_page_in_results["next"].append(
-                        {
-                            "path": destination_path,
-                            "condition": condition["name"],
-                        }
-                    )
+        #         partial_form_json["pages"].append(sub_page)
+
+        #     this_page_in_results["next"].append(
+        #         {
+        #             "path": destination_path,
+        #             "condition": condition["name"],
+        #         }
+        #     )
 
         # If there were no conditions and we just continue to the next page
         if not has_conditions:
@@ -185,32 +187,35 @@ def build_start_page_content_component(content: str, pages) -> dict:
     return result
 
 
-# title arg is used for title of first page in form
-def build_form_json(input_json: dict, form_title: str, form_id: str) -> dict:
+def human_to_kebab_case(word: str) -> str | None:
+    if word:
+        return word.replace(" ", "-").strip().lower()
+
+
+def build_form_json(form: Form) -> dict:
 
     results = copy.deepcopy(BASIC_FORM_STRUCTURE)
-    results["name"] = form_title
+    results["name"] = form.name_in_apply["en"]
 
-    for page in input_json["pages"]:
+    for page in form.pages:
         results["pages"].append(build_page(page))
 
     start_page = copy.deepcopy(BASIC_PAGE_STRUCTURE)
     start_page.update(
         {
-            "title": form_title,
-            "path": f"/intro-{form_id}",
+            "title": form.name_in_apply["en"],
+            "path": f"/intro-{human_to_kebab_case(form.name_in_apply['en'])}",
             "controller": "./pages/start.js",
-            "next": [{"path": f"/{input_json['pages'][0]}"}],
+            "next": [{"path": f"/{form.pages[0].display_path}"}],
         }
     )
-    if intro_content := input_json.get("intro_content"):
-        content = build_start_page_content_component(content=intro_content, pages=results["pages"])
-        start_page["components"].append(content)
+    intro_content = build_start_page_content_component(content=None, pages=results["pages"])
+    start_page["components"].append(intro_content)
 
     results["pages"].append(start_page)
     results["startPage"] = start_page["path"]
 
-    results = build_navigation(results, input_json["pages"])
+    results = build_navigation(results, form.pages)
 
     results["lists"] = build_lists(results["pages"])
 
