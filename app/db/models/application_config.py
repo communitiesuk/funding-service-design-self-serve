@@ -1,3 +1,4 @@
+import uuid
 from dataclasses import dataclass
 from enum import Enum
 from typing import List
@@ -5,6 +6,8 @@ from typing import List
 from flask_sqlalchemy.model import DefaultMeta
 from sqlalchemy import Column
 from sqlalchemy import ForeignKey
+from sqlalchemy import Integer
+from sqlalchemy import String
 from sqlalchemy.dialects.postgresql import ENUM
 from sqlalchemy.dialects.postgresql import JSON
 from sqlalchemy.dialects.postgresql import UUID
@@ -39,13 +42,14 @@ class Section(BaseModel):
         "section_id",
         UUID(as_uuid=True),
         primary_key=True,
+        default=uuid.uuid4,
     )
     name_in_apply = Column("name_in_apply_json", JSON(none_as_null=True), nullable=False, unique=False)
-    template_name = Column("Template Name", db.String(), nullable=True)
+    template_name = Column("Template Name", String(), nullable=True)
     is_template = Column("is_template", Boolean, default=False, nullable=False)
     audit_info = Column("audit_info", JSON(none_as_null=True))
     forms: Mapped[List["Form"]] = relationship("Form")
-    index = Column(db.Integer())
+    index = Column(Integer())
 
 
 @dataclass
@@ -61,12 +65,13 @@ class Form(BaseModel):
         "form_id",
         UUID(as_uuid=True),
         primary_key=True,
+        default=uuid.uuid4,
     )
     name_in_apply = Column("name_in_apply_json", JSON(none_as_null=True), nullable=False, unique=False)
-    template_name = Column("Template Name", db.String(), nullable=True)
+    template_name = Column("Template Name", String(), nullable=True)
     is_template = Column("is_template", Boolean, default=False, nullable=False)
     audit_info = Column("audit_info", JSON(none_as_null=True))
-    section_index = Column("section_index", db.Integer())
+    section_index = Column("section_index", Integer())
     pages: Mapped[List["Page"]] = relationship("Page")
 
 
@@ -83,36 +88,43 @@ class Page(BaseModel):
         "page_id",
         UUID(as_uuid=True),
         primary_key=True,
+        default=uuid.uuid4,
     )
     name_in_apply = Column("name_in_apply_json", JSON(none_as_null=True), nullable=False, unique=False)
-    template_name = Column("Template Name", db.String(), nullable=True)
+    template_name = Column("Template Name", String(), nullable=True)
     is_template = Column("is_template", Boolean, default=False, nullable=False)
     audit_info = Column("audit_info", JSON(none_as_null=True))
-    form_index = Column(db.Integer())
-    display_path = Column("display_path", db.String())
+    form_index = Column(Integer())
+    display_path = Column("display_path", String())
     components: Mapped[List["Component"]] = relationship("Component")
 
 
 @dataclass
 class Component(BaseModel):
 
+    component_id = Column(
+        "component_id",
+        UUID(as_uuid=True),
+        primary_key=True,
+        default=uuid.uuid4,
+    )
     page_id = Column(
         "page_id",
         UUID(as_uuid=True),
         ForeignKey("page.page_id"),
         nullable=True,  # will be null where this is a template and not linked to a page
     )
-    component_id = Column(
-        "component_id",
+    theme_id = Column(
         UUID(as_uuid=True),
-        primary_key=True,
+        ForeignKey("theme.theme_id"),
+        nullable=True,  # will be null where this is a template and not linked to a theme
     )
-    title = Column(db.String())
-    hint_text = Column(db.String(), nullable=True)
+    title = Column(String())
+    hint_text = Column(String(), nullable=True)
     options = Column(JSON(none_as_null=False))
     type = Column(ENUM(ComponentType))
-    template_name = Column("Template Name", db.String(), nullable=True)
+    template_name = Column("Template Name", String(), nullable=True)
     is_template = Column("is_template", Boolean, default=False, nullable=False)
     audit_info = Column("audit_info", JSON(none_as_null=True))
-    page_index = Column(db.Integer())
+    page_index = Column(Integer())
     conditions = Column(JSON(none_as_null=True))

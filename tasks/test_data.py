@@ -54,8 +54,20 @@ f1: Form = Form(
     form_id=uuid4(), section_id=s1.section_id, name_in_apply={"en": "About your organisation"}, section_index=1
 )
 f2: Form = Form(form_id=uuid4(), section_id=s1.section_id, name_in_apply={"en": "Contact Details"}, section_index=2)
-p1: Page = Page(page_id=uuid4(), form_id=f1.form_id, name_in_apply={"en": "Organisation Name"}, form_index=1)
-p2: Page = Page(page_id=uuid4(), form_id=f1.form_id, name_in_apply={"en": "Organisation Address"}, form_index=2)
+p1: Page = Page(
+    page_id=uuid4(),
+    form_id=f1.form_id,
+    display_path="organisation-name",
+    name_in_apply={"en": "Organisation Name"},
+    form_index=1,
+)
+p2: Page = Page(
+    page_id=uuid4(),
+    display_path="organisation-address",
+    form_id=f1.form_id,
+    name_in_apply={"en": "Organisation Address"},
+    form_index=2,
+)
 c1: Component = Component(
     component_id=uuid4(),
     page_id=p1.page_id,
@@ -79,7 +91,13 @@ c2: Component = Component(
     type=ComponentType.UK_ADDRESS_FIELD,
     page_index=1,
 )
-p3: Page = Page(page_id=uuid4(), form_id=f2.form_id, name_in_apply={"en": "Lead Contact Details"}, form_index=1)
+p3: Page = Page(
+    page_id=uuid4(),
+    form_id=f2.form_id,
+    display_path="lead-contact-details",
+    name_in_apply={"en": "Lead Contact Details"},
+    form_index=1,
+)
 c4: Component = Component(
     component_id=uuid4(),
     page_id=p3.page_id,

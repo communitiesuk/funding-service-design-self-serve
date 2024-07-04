@@ -49,3 +49,18 @@ def create_test_data(c):
         db.session.execute(text("TRUNCATE TABLE fund, round, section,form, page, component CASCADE;"))
         db.session.commit()
         insert_test_data(db=db)
+
+
+@task
+def init_migrations(c):
+    """Deletes the migrations/versions folder and recreates migrations from scratch"""
+
+    import shutil
+
+    with app.app_context():
+        db = app.extensions["sqlalchemy"]
+        try:
+            shutil.rmtree("./app/db/migrations/versions/")
+            db.migrate()
+        except Exception as e:
+            print("Could not delete folder" + e)
