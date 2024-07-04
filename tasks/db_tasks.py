@@ -5,6 +5,8 @@ from invoke import task  # noqa:E402
 
 from app.app import app  # noqa:E402
 
+from .test_data import insert_test_data  # noqa:E402
+
 
 @task
 def recreate_local_dbs(c):
@@ -35,3 +37,15 @@ def recreate_local_dbs(c):
             print(
                 f"{db_uri} db created...",
             )
+
+
+@task
+def create_test_data(c):
+    """Inserts some initial test data"""
+    from sqlalchemy import text
+
+    with app.app_context():
+        db = app.extensions["sqlalchemy"]
+        db.session.execute(text("TRUNCATE TABLE fund, round, section,form, page, component CASCADE;"))
+        db.session.commit()
+        insert_test_data(db=db)

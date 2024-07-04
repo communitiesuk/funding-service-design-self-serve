@@ -14,7 +14,8 @@
                 "ms-python.vscode-pylance",
                 "ms-python.debugpy",
                 "ms-python.black-formatter",
-                "ms-python.isort"
+                "ms-python.isort",
+                "monosans.djlint"
             ]
         }
     }

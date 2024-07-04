@@ -4,6 +4,7 @@ from flask import Blueprint
 from flask import flash
 from flask import redirect
 from flask import render_template
+from flask import request
 from flask import url_for
 
 from app.blueprints.fund_builder.forms.fund import FundForm
@@ -12,6 +13,7 @@ from app.db.models.fund import Fund
 from app.db.models.round import Round
 from app.db.queries.fund import add_fund
 from app.db.queries.fund import get_all_funds
+from app.db.queries.fund import get_fund_by_id
 from app.db.queries.round import add_round
 
 build_fund_bp = Blueprint(
@@ -20,6 +22,21 @@ build_fund_bp = Blueprint(
     url_prefix="/",
     template_folder="templates",
 )
+
+
+def all_funds_as_govuk_select_items(all_funds: list) -> list:
+    return [{"text": f"{f.short_name} - {f.name_json['en']}", "value": str(f.fund_id)} for f in all_funds]
+
+
+@build_fund_bp.route("/fund/view", methods=["GET", "POST"])
+def view_fund():
+    params = {"all_funds": all_funds_as_govuk_select_items(get_all_funds())}
+    if request.method == "POST":
+        fund_id = request.form.get("fund_id")
+        fund = get_fund_by_id(fund_id)
+        params["fund"] = fund
+
+    return render_template("view_full_setup.html", **params)
 
 
 @build_fund_bp.route("/fund", methods=["GET", "POST"])
@@ -69,5 +86,5 @@ def round():
     return render_template(
         "round.html",
         form=form,
-        all_funds=[{"text": f"{f.short_name} - {f.name_json['en']}", "value": str(f.fund_id)} for f in all_funds],
+        all_funds=all_funds_as_govuk_select_items(all_funds),
     )

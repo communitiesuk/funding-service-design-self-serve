@@ -1,5 +1,6 @@
 from datetime import datetime
 from random import randint
+from uuid import uuid4
 
 import pytest
 from flask_migrate import upgrade
@@ -10,6 +11,7 @@ from app.db.models.fund import Fund
 from app.db.models.round import Round
 from app.db.queries.fund import add_fund
 from app.db.queries.fund import get_all_funds
+from app.db.queries.fund import get_fund_by_id
 from app.db.queries.round import add_round
 
 url_base = "postgresql://postgres:password@fsd-self-serve-db:5432/fund_builder"  # pragma: allowlist secret
@@ -50,7 +52,7 @@ def test_add_fund(flask_test_client, _db):
     )
     result = add_fund(f)
     assert result
-    assert result.id
+    assert result.fund_id
 
 
 def test_add_round(flask_test_client, _db):
@@ -77,3 +79,14 @@ def test_add_round(flask_test_client, _db):
 def test_get_all_funds(flask_test_client, _db):
     results = get_all_funds()
     assert results
+
+
+def test_get_fund_by_id(flask_test_client, _db):
+    any_fund = _db.session.execute(text("select * from fund limit 1;")).one()
+    result: Fund = get_fund_by_id(any_fund.fund_id)
+    assert result.name_json == any_fund.name_json
+
+
+def test_get_fund_by_id_none(flask_test_client, _db):
+    result: Fund = get_fund_by_id(str(uuid4()))
+    assert result is None

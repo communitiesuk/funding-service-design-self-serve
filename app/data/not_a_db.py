@@ -100,7 +100,7 @@ COMPONENTS = [
             },
             {
                 "name": "organisation_other_names_yes",
-                "value": "true",
+                "value": "true",  # this must be lowercaes or the navigation doesn't work
                 "operator": "is",
                 "destination_page": "alternative-organisation-name",
             },

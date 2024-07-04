@@ -3,6 +3,7 @@ from wtforms import DateTimeField
 from wtforms import HiddenField
 from wtforms import StringField
 from wtforms import URLField
+from wtforms.validators import URL
 from wtforms.validators import DataRequired
 from wtforms.validators import Length
 
@@ -21,5 +22,5 @@ class RoundForm(FlaskForm):
     assessment_start = DateTimeField("Assessment Start")
     reminder_date = DateTimeField("Reminder Date")
     assessment_deadline = DateTimeField("Assessment Deadline")
-    prospectus_link = URLField("Prospectus", validators=[DataRequired()])
-    privacy_notice_link = URLField("Privacy Notice", validators=[DataRequired()])
+    prospectus_link = URLField("Prospectus Link", validators=[DataRequired(), URL()])
+    privacy_notice_link = URLField("Privacy Notice Link", validators=[DataRequired(), URL()])
