@@ -127,4 +127,21 @@ class Component(BaseModel):
     is_template = Column("is_template", Boolean, default=False, nullable=False)
     audit_info = Column("audit_info", JSON(none_as_null=True))
     page_index = Column(Integer())
+    theme_index = Column(Integer())
     conditions = Column(JSON(none_as_null=True))
+
+    @property
+    def assessment_display_type(self):
+        return {
+            "numberfield": "integer",
+            "textfield": "text",
+            "yesnofield": "text",
+            "freetextfield": "free_text",
+            "checkboxesfield": "list",
+            "multiinputfield": "table",
+            "clientsidefileuploadfield": "s3bucketPath",
+            "radiosfield": "text",
+            "emailaddressfield": "text",
+            "telephonenumberfield": "text",
+            "ukaddressfield": "address",
+        }.get(self.type.value.casefold())

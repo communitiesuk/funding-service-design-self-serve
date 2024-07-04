@@ -6,21 +6,21 @@
 {% block content %}
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-full">
-            <h1 class="govuk-heading-l">View Full Application Config</h1>
+            <h1 class="govuk-heading-l">View Full Assessment Config</h1>
             <h2 class="govuk-heading-m">{{ fund.short_name }} - {{ round.short_name }}</h2>
         </div>
     </div>
-    {% for section in round.sections %}
+    {% for criteria in round.criteria %}
         <div class="govuk-grid-row">
             <div class="govuk-grid-column-full">
-                <h3 class="govuk-heading-s">{{ section.index }}. {{ section.name_in_apply["en"] }}</h3>
-                {% for form in section.forms %}
-                    <h4 class="govuk-heading-s">Form {{ form.section_index }}. {{ form.name_in_apply["en"] }}</h4>
-                    {% for page in form.pages %}
-                        <div class="section_page"><span class="govuk-body">{{ page.form_index }}. {{ page.name_in_apply["en"] }}</span>
+                <h3 class="govuk-heading-s">{{ criteria.index }}. {{ criteria.name }} (weighting: {{criteria.weighting}})</h3>
+                {% for subcriteria in criteria.subcriteria %}
+                    <h4 class="govuk-heading-s">Form {{ subcriteria.criteria_index }}. {{ subcriteria.name }}</h4>
+                    {% for theme in subcriteria.themes %}
+                        <div class="section_page"><span class="govuk-body">{{ theme.subcriteria_index }}. {{ theme.name }}</span>
                             <ul class="govuk-list--bullet">
-                            {%for component in page.components %}
-                                <li class="govuk-body">{{component.page_index}} - {{component.title}} ({{component.type.value}})</li>
+                            {%for component in theme.components %}
+                                <li class="govuk-body">{{component.theme_index}} - {{component.title}} ({{component.assessment_display_type}})</li>
                             {% endfor %}</ul>
                         </div>
                     {% endfor %}

@@ -55,12 +55,17 @@ def create_test_data(c):
 def init_migrations(c):
     """Deletes the migrations/versions folder and recreates migrations from scratch"""
 
+    import os
     import shutil
 
+    from flask_migrate import migrate
+
     with app.app_context():
-        db = app.extensions["sqlalchemy"]
         try:
-            shutil.rmtree("./app/db/migrations/versions/")
-            db.migrate()
+            versions_path = "./app/db/migrations/versions/"
+            if os.path.exists(versions_path):
+                shutil.rmtree(versions_path)
+                os.mkdir(versions_path)
         except Exception as e:
-            print("Could not delete folder" + e)
+            print("Could not delete folder " + str(e))
+        migrate()

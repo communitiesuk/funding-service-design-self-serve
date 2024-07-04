@@ -47,6 +47,13 @@ def view_app_config(round_id):
     return render_template("view_application_config.html", round=round, fund=fund)
 
 
+@build_fund_bp.route("/fund/round/<round_id>/assessment_config")
+def view_assess_config(round_id):
+    round = get_round_by_id(round_id)
+    fund = get_fund_by_id(round.fund_id)
+    return render_template("view_assessment_config.html", round=round, fund=fund)
+
+
 @build_fund_bp.route("/fund", methods=["GET", "POST"])
 def fund():
     form: FundForm = FundForm()

@@ -1,8 +1,8 @@
 """empty message
 
-Revision ID: e88df5a3b683
+Revision ID: 5cc88a58f442
 Revises:
-Create Date: 2024-07-04 09:07:55.777783
+Create Date: 2024-07-04 13:01:09.167287
 
 """
 
@@ -11,7 +11,7 @@ from alembic import op
 from sqlalchemy.dialects import postgresql
 
 # revision identifiers, used by Alembic.
-revision = "e88df5a3b683"
+revision = "5cc88a58f442"
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -52,6 +52,19 @@ def upgrade():
         sa.UniqueConstraint("fund_id", "short_name", name=op.f("uq_round_fund_id")),
     )
     op.create_table(
+        "criteria",
+        sa.Column("criteria_id", sa.UUID(), nullable=False),
+        sa.Column("round_id", sa.UUID(), nullable=True),
+        sa.Column("name", sa.String(), nullable=True),
+        sa.Column("weighting", sa.Float(precision=2), nullable=True),
+        sa.Column("Template Name", sa.String(), nullable=True),
+        sa.Column("is_template", sa.Boolean(), nullable=False),
+        sa.Column("audit_info", postgresql.JSON(none_as_null=True, astext_type=sa.Text()), nullable=True),
+        sa.Column("index", sa.Integer(), nullable=True),
+        sa.ForeignKeyConstraint(["round_id"], ["round.round_id"], name=op.f("fk_criteria_round_id_round")),
+        sa.PrimaryKeyConstraint("criteria_id", name=op.f("pk_criteria")),
+    )
+    op.create_table(
         "section",
         sa.Column("round_id", sa.UUID(), nullable=True),
         sa.Column("section_id", sa.UUID(), nullable=False),
@@ -59,6 +72,7 @@ def upgrade():
         sa.Column("Template Name", sa.String(), nullable=True),
         sa.Column("is_template", sa.Boolean(), nullable=False),
         sa.Column("audit_info", postgresql.JSON(none_as_null=True, astext_type=sa.Text()), nullable=True),
+        sa.Column("index", sa.Integer(), nullable=True),
         sa.ForeignKeyConstraint(["round_id"], ["round.round_id"], name=op.f("fk_section_round_id_round")),
         sa.PrimaryKeyConstraint("section_id", name=op.f("pk_section")),
     )
@@ -75,6 +89,20 @@ def upgrade():
         sa.PrimaryKeyConstraint("form_id", name=op.f("pk_form")),
     )
     op.create_table(
+        "subcriteria",
+        sa.Column("subcriteria_id", sa.UUID(), nullable=False),
+        sa.Column("criteria_id", sa.UUID(), nullable=True),
+        sa.Column("name", sa.String(), nullable=True),
+        sa.Column("Template Name", sa.String(), nullable=True),
+        sa.Column("is_template", sa.Boolean(), nullable=False),
+        sa.Column("audit_info", postgresql.JSON(none_as_null=True, astext_type=sa.Text()), nullable=True),
+        sa.Column("criteria_index", sa.Integer(), nullable=True),
+        sa.ForeignKeyConstraint(
+            ["criteria_id"], ["criteria.criteria_id"], name=op.f("fk_subcriteria_criteria_id_criteria")
+        ),
+        sa.PrimaryKeyConstraint("subcriteria_id", name=op.f("pk_subcriteria")),
+    )
+    op.create_table(
         "page",
         sa.Column("form_id", sa.UUID(), nullable=True),
         sa.Column("page_id", sa.UUID(), nullable=False),
@@ -88,9 +116,24 @@ def upgrade():
         sa.PrimaryKeyConstraint("page_id", name=op.f("pk_page")),
     )
     op.create_table(
+        "theme",
+        sa.Column("theme_id", sa.UUID(), nullable=False),
+        sa.Column("subcriteria_id", sa.UUID(), nullable=True),
+        sa.Column("name", sa.String(), nullable=True),
+        sa.Column("Template Name", sa.String(), nullable=True),
+        sa.Column("is_template", sa.Boolean(), nullable=False),
+        sa.Column("audit_info", postgresql.JSON(none_as_null=True, astext_type=sa.Text()), nullable=True),
+        sa.Column("subcriteria_index", sa.Integer(), nullable=True),
+        sa.ForeignKeyConstraint(
+            ["subcriteria_id"], ["subcriteria.subcriteria_id"], name=op.f("fk_theme_subcriteria_id_subcriteria")
+        ),
+        sa.PrimaryKeyConstraint("theme_id", name=op.f("pk_theme")),
+    )
+    op.create_table(
         "component",
-        sa.Column("page_id", sa.UUID(), nullable=True),
         sa.Column("component_id", sa.UUID(), nullable=False),
+        sa.Column("page_id", sa.UUID(), nullable=True),
+        sa.Column("theme_id", sa.UUID(), nullable=True),
         sa.Column("title", sa.String(), nullable=True),
         sa.Column("hint_text", sa.String(), nullable=True),
         sa.Column("options", postgresql.JSON(astext_type=sa.Text()), nullable=True),
@@ -111,8 +154,10 @@ def upgrade():
         sa.Column("is_template", sa.Boolean(), nullable=False),
         sa.Column("audit_info", postgresql.JSON(none_as_null=True, astext_type=sa.Text()), nullable=True),
         sa.Column("page_index", sa.Integer(), nullable=True),
+        sa.Column("theme_index", sa.Integer(), nullable=True),
         sa.Column("conditions", postgresql.JSON(none_as_null=True, astext_type=sa.Text()), nullable=True),
         sa.ForeignKeyConstraint(["page_id"], ["page.page_id"], name=op.f("fk_component_page_id_page")),
+        sa.ForeignKeyConstraint(["theme_id"], ["theme.theme_id"], name=op.f("fk_component_theme_id_theme")),
         sa.PrimaryKeyConstraint("component_id", name=op.f("pk_component")),
     )
     # ### end Alembic commands ###
@@ -121,9 +166,12 @@ def upgrade():
 def downgrade():
     # ### commands auto generated by Alembic - please adjust! ###
     op.drop_table("component")
+    op.drop_table("theme")
     op.drop_table("page")
+    op.drop_table("subcriteria")
     op.drop_table("form")
     op.drop_table("section")
+    op.drop_table("criteria")
     op.drop_table("round")
     op.drop_table("fund")
     # ### end Alembic commands ###

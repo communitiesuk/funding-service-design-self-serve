@@ -154,6 +154,11 @@
             "href": url_for("build_fund_bp.view_app_config", round_id=round.round_id),
             "classes": "govuk-button--secondary"
             }) }}
+            {{ govukButton({
+                "text": "View Assessment Config",
+                "href": url_for("build_fund_bp.view_assess_config", round_id=round.round_id),
+                "classes": "govuk-button--secondary"
+                }) }}
                         {% endfor %}
 
                 {% endset %}
