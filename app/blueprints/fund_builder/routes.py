@@ -11,6 +11,7 @@ from app.blueprints.fund_builder.forms.round import RoundForm
 from app.db.models.fund import Fund
 from app.db.models.round import Round
 from app.db.queries.fund import add_fund
+from app.db.queries.fund import get_all_funds
 from app.db.queries.round import add_round
 
 build_fund_bp = Blueprint(
@@ -43,11 +44,12 @@ def fund():
 
 @build_fund_bp.route("/round", methods=["GET", "POST"])
 def round():
+    all_funds = get_all_funds()
     form: RoundForm = RoundForm()
     if form.validate_on_submit():
         add_round(
             Round(
-                fund_id="91788a0b-d57c-4019-97a9-89111849dc22",
+                fund_id=form.fund_id.data,
                 audit_info={"user": "dummy_user", "timestamp": datetime.now().isoformat(), "action": "create"},
                 title_json={"en": form.title_en.data},
                 short_name=form.short_name.data,
@@ -64,4 +66,8 @@ def round():
         flash(f"Saved round {form.title_en.data}")
         return redirect(url_for("self_serve_bp.index"))
 
-    return render_template("round.html", form=form)
+    return render_template(
+        "round.html",
+        form=form,
+        all_funds=[{"text": f"{f.short_name} - {f.name_json['en']}", "value": str(f.fund_id)} for f in all_funds],
+    )

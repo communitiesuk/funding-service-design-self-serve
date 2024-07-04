@@ -18,7 +18,7 @@ BaseModel: DefaultMeta = db.Model
 @dataclass
 class Round(BaseModel):
     __table_args__ = (UniqueConstraint("fund_id", "short_name"),)
-    id = Column(
+    round_id = Column(
         "round_id",
         UUID(as_uuid=True),
         primary_key=True,

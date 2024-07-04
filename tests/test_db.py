@@ -1,18 +1,22 @@
+from datetime import datetime
 from random import randint
 
 import pytest
-from flask import Flask
 from flask_migrate import upgrade
+from sqlalchemy import text
 
 from app.app import create_app
 from app.db.models.fund import Fund
+from app.db.models.round import Round
 from app.db.queries.fund import add_fund
+from app.db.queries.fund import get_all_funds
+from app.db.queries.round import add_round
 
 url_base = "postgresql://postgres:password@fsd-self-serve-db:5432/fund_builder"  # pragma: allowlist secret
 
 
 @pytest.fixture(scope="session")
-def app() -> Flask:
+def app():
     app = create_app(config={"SQLALCHEMY_DATABASE_URI": url_base})
     yield app
 
@@ -42,8 +46,34 @@ def test_add_fund(flask_test_client, _db):
         title_json={"en": "longer hello"},
         description_json={"en": "reeeaaaaallly loooooooog helloooooooooo"},
         welsh_available=False,
-        short_name=f"H{randint(0,99999)}",
+        short_name=f"X{randint(0,99999)}",
     )
     result = add_fund(f)
     assert result
     assert result.id
+
+
+def test_add_round(flask_test_client, _db):
+    fund = _db.session.execute(text("select * from fund limit 1;")).one()
+    result = add_round(
+        Round(
+            fund_id=fund.fund_id,
+            audit_info={"user": "dummy_user", "timestamp": datetime.now().isoformat(), "action": "create"},
+            title_json={"en": "test title"},
+            short_name=f"Z{randint(0,99999)}",
+            opens=datetime.now(),
+            deadline=datetime.now(),
+            assessment_start=datetime.now(),
+            reminder_date=datetime.now(),
+            assessment_deadline=datetime.now(),
+            prospectus_link="http://www.google.com",
+            privacy_notice_link="http://www.google.com",
+        )
+    )
+    assert result
+    assert result.round_id
+
+
+def test_get_all_funds(flask_test_client, _db):
+    results = get_all_funds()
+    assert results

@@ -19,7 +19,7 @@ BaseModel: DefaultMeta = db.Model
 
 @dataclass
 class Fund(BaseModel):
-    id = Column(
+    fund_id = Column(
         "fund_id",
         UUID(as_uuid=True),
         primary_key=True,
