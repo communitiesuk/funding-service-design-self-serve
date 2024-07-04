@@ -15,6 +15,7 @@ from app.db.queries.fund import add_fund
 from app.db.queries.fund import get_all_funds
 from app.db.queries.fund import get_fund_by_id
 from app.db.queries.round import add_round
+from app.db.queries.round import get_round_by_id
 
 build_fund_bp = Blueprint(
     "build_fund_bp",
@@ -36,7 +37,14 @@ def view_fund():
         fund = get_fund_by_id(fund_id)
         params["fund"] = fund
 
-    return render_template("view_full_setup.html", **params)
+    return render_template("view_fund_config.html", **params)
+
+
+@build_fund_bp.route("/fund/round/<round_id>/application_config")
+def view_app_config(round_id):
+    round = get_round_by_id(round_id)
+    fund = get_fund_by_id(round.fund_id)
+    return render_template("view_application_config.html", round=round, fund=fund)
 
 
 @build_fund_bp.route("/fund", methods=["GET", "POST"])

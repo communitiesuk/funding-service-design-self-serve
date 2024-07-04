@@ -47,7 +47,9 @@ r2: Round = Round(
     privacy_notice_link="http://www.google.com",
 )
 
-s1: Section = Section(section_id=uuid4(), round_id=r.round_id, name_in_apply={"en": "Organisation Information"})
+s1: Section = Section(
+    section_id=uuid4(), index=1, round_id=r.round_id, name_in_apply={"en": "Organisation Information"}
+)
 f1: Form = Form(
     form_id=uuid4(), section_id=s1.section_id, name_in_apply={"en": "About your organisation"}, section_index=1
 )

@@ -45,6 +45,7 @@ class Section(BaseModel):
     is_template = Column("is_template", Boolean, default=False, nullable=False)
     audit_info = Column("audit_info", JSON(none_as_null=True))
     forms: Mapped[List["Form"]] = relationship("Form")
+    index = Column(db.Integer())
 
 
 @dataclass

@@ -8,9 +8,12 @@ from sqlalchemy import ForeignKey
 from sqlalchemy import UniqueConstraint
 from sqlalchemy.dialects.postgresql import JSON
 from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy.orm import Mapped
+from sqlalchemy.orm import relationship
 from sqlalchemy.types import Boolean
 
 from app.db import db
+from app.db.models import Section
 
 BaseModel: DefaultMeta = db.Model
 
@@ -42,4 +45,5 @@ class Round(BaseModel):
     privacy_notice_link = Column("privacy_notice", db.String(), nullable=False, unique=False)
     audit_info = Column("audit_info", JSON(none_as_null=True))
     is_template = Column("is_template", Boolean, default=False, nullable=False)
+    sections: Mapped[list["Section"]] = relationship("Section")
     # several other fields to add

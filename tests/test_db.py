@@ -13,6 +13,7 @@ from app.db.queries.fund import add_fund
 from app.db.queries.fund import get_all_funds
 from app.db.queries.fund import get_fund_by_id
 from app.db.queries.round import add_round
+from app.db.queries.round import get_round_by_id
 
 url_base = "postgresql://postgres:password@fsd-self-serve-db:5432/fund_builder"  # pragma: allowlist secret
 
@@ -90,3 +91,14 @@ def test_get_fund_by_id(flask_test_client, _db):
 def test_get_fund_by_id_none(flask_test_client, _db):
     result: Fund = get_fund_by_id(str(uuid4()))
     assert result is None
+
+
+def test_get_round_by_id_none(flask_test_client, _db):
+    result: Round = get_round_by_id(str(uuid4()))
+    assert result is None
+
+
+def test_get_round_by_id(flask_test_client, _db):
+    any_round = _db.session.execute(text("select * from round limit 1;")).one()
+    result: Round = get_round_by_id(any_round.round_id)
+    assert result.title_json == any_round.title_json
