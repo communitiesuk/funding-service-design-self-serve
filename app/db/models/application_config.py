@@ -50,6 +50,7 @@ class Section(BaseModel):
     audit_info = Column("audit_info", JSON(none_as_null=True))
     forms: Mapped[List["Form"]] = relationship("Form")
     index = Column(Integer())
+    source_template_id = Column(UUID(as_uuid=True), nullable=True)
 
 
 @dataclass
@@ -73,6 +74,8 @@ class Form(BaseModel):
     audit_info = Column("audit_info", JSON(none_as_null=True))
     section_index = Column("section_index", Integer())
     pages: Mapped[List["Page"]] = relationship("Page")
+    runner_publish_name = Column(db.String())
+    source_template_id = Column(UUID(as_uuid=True), nullable=True)
 
 
 @dataclass
@@ -97,6 +100,7 @@ class Page(BaseModel):
     form_index = Column(Integer())
     display_path = Column("display_path", String())
     components: Mapped[List["Component"]] = relationship("Component")
+    source_template_id = Column(UUID(as_uuid=True), nullable=True)
 
 
 @dataclass
@@ -130,9 +134,11 @@ class Component(BaseModel):
     page_index = Column(Integer())
     theme_index = Column(Integer())
     conditions = Column(JSON(none_as_null=True))
+    source_template_id = Column(UUID(as_uuid=True), nullable=True)
 
     @property
     def assessment_display_type(self):
+        # TODO extend this to account for what's in self.options eg. if prefix==£, return 'currency'
         return {
             "numberfield": "integer",
             "textfield": "text",

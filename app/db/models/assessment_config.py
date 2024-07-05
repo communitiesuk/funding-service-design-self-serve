@@ -39,6 +39,7 @@ class Criteria(BaseModel):
     audit_info = Column("audit_info", JSON(none_as_null=True))
     subcriteria: Mapped[List["Subcriteria"]] = relationship("Subcriteria")
     index = Column(Integer())
+    source_template_id = Column(UUID(as_uuid=True), nullable=True)
 
 
 @dataclass
@@ -54,11 +55,12 @@ class Subcriteria(BaseModel):
         nullable=True,
     )
     name = Column(String())
-    template_name = Column("Template Name", String(), nullable=True)
+    template_name = Column(String(), nullable=True)
     is_template = Column("is_template", Boolean, default=False, nullable=False)
     audit_info = Column("audit_info", JSON(none_as_null=True))
     themes: Mapped[List["Theme"]] = relationship("Theme")
     criteria_index = Column(Integer())
+    source_template_id = Column(UUID(as_uuid=True), nullable=True)
 
 
 @dataclass
@@ -79,3 +81,4 @@ class Theme(BaseModel):
     audit_info = Column("audit_info", JSON(none_as_null=True))
     components: Mapped[List["Component"]] = relationship("Component")
     subcriteria_index = Column(Integer())
+    source_template_id = Column(UUID(as_uuid=True), nullable=True)

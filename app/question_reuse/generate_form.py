@@ -92,24 +92,26 @@ def build_page(page: Page) -> dict:
     # if controller := input_page.get("controller", None):
     #     page["controller"] = controller
     for component in page.components:
-        build_component = {
-            "options": component.options,
+        built_component = {
+            "options": component.options or {},
             "type": component.type.value,
             "title": component.title,
             "hint": component.hint_text,
             "schema": {},
+            "name": str(component.component_id),
         }
 
-        built_page["components"].append(build_component)
+        built_page["components"].append(built_component)
 
     return built_page
 
 
 # Goes through the set of pages and updates the conditions and next properties to account for branching
 def build_navigation(partial_form_json: dict, input_pages: list[Page]) -> dict:
+    # TODO order by index not order in list
     for i in range(0, len(input_pages)):
         if i < len(input_pages) - 1:
-            next_path = input_pages[i + 1]
+            next_path = input_pages[i + 1].display_path
         elif i == len(input_pages) - 1:
             next_path = "summary"
         else:

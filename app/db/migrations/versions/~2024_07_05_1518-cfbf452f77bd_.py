@@ -1,8 +1,8 @@
 """empty message
 
-Revision ID: 5cc88a58f442
+Revision ID: cfbf452f77bd
 Revises:
-Create Date: 2024-07-04 13:01:09.167287
+Create Date: 2024-07-05 15:18:37.258027
 
 """
 
@@ -11,7 +11,7 @@ from alembic import op
 from sqlalchemy.dialects import postgresql
 
 # revision identifiers, used by Alembic.
-revision = "5cc88a58f442"
+revision = "cfbf452f77bd"
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -61,6 +61,7 @@ def upgrade():
         sa.Column("is_template", sa.Boolean(), nullable=False),
         sa.Column("audit_info", postgresql.JSON(none_as_null=True, astext_type=sa.Text()), nullable=True),
         sa.Column("index", sa.Integer(), nullable=True),
+        sa.Column("source_template_id", sa.UUID(), nullable=True),
         sa.ForeignKeyConstraint(["round_id"], ["round.round_id"], name=op.f("fk_criteria_round_id_round")),
         sa.PrimaryKeyConstraint("criteria_id", name=op.f("pk_criteria")),
     )
@@ -73,6 +74,7 @@ def upgrade():
         sa.Column("is_template", sa.Boolean(), nullable=False),
         sa.Column("audit_info", postgresql.JSON(none_as_null=True, astext_type=sa.Text()), nullable=True),
         sa.Column("index", sa.Integer(), nullable=True),
+        sa.Column("source_template_id", sa.UUID(), nullable=True),
         sa.ForeignKeyConstraint(["round_id"], ["round.round_id"], name=op.f("fk_section_round_id_round")),
         sa.PrimaryKeyConstraint("section_id", name=op.f("pk_section")),
     )
@@ -85,6 +87,8 @@ def upgrade():
         sa.Column("is_template", sa.Boolean(), nullable=False),
         sa.Column("audit_info", postgresql.JSON(none_as_null=True, astext_type=sa.Text()), nullable=True),
         sa.Column("section_index", sa.Integer(), nullable=True),
+        sa.Column("runner_publish_name", sa.String(), nullable=True),
+        sa.Column("source_template_id", sa.UUID(), nullable=True),
         sa.ForeignKeyConstraint(["section_id"], ["section.section_id"], name=op.f("fk_form_section_id_section")),
         sa.PrimaryKeyConstraint("form_id", name=op.f("pk_form")),
     )
@@ -93,10 +97,11 @@ def upgrade():
         sa.Column("subcriteria_id", sa.UUID(), nullable=False),
         sa.Column("criteria_id", sa.UUID(), nullable=True),
         sa.Column("name", sa.String(), nullable=True),
-        sa.Column("Template Name", sa.String(), nullable=True),
+        sa.Column("template_name", sa.String(), nullable=True),
         sa.Column("is_template", sa.Boolean(), nullable=False),
         sa.Column("audit_info", postgresql.JSON(none_as_null=True, astext_type=sa.Text()), nullable=True),
         sa.Column("criteria_index", sa.Integer(), nullable=True),
+        sa.Column("source_template_id", sa.UUID(), nullable=True),
         sa.ForeignKeyConstraint(
             ["criteria_id"], ["criteria.criteria_id"], name=op.f("fk_subcriteria_criteria_id_criteria")
         ),
@@ -112,6 +117,7 @@ def upgrade():
         sa.Column("audit_info", postgresql.JSON(none_as_null=True, astext_type=sa.Text()), nullable=True),
         sa.Column("form_index", sa.Integer(), nullable=True),
         sa.Column("display_path", sa.String(), nullable=True),
+        sa.Column("source_template_id", sa.UUID(), nullable=True),
         sa.ForeignKeyConstraint(["form_id"], ["form.form_id"], name=op.f("fk_page_form_id_form")),
         sa.PrimaryKeyConstraint("page_id", name=op.f("pk_page")),
     )
@@ -124,6 +130,7 @@ def upgrade():
         sa.Column("is_template", sa.Boolean(), nullable=False),
         sa.Column("audit_info", postgresql.JSON(none_as_null=True, astext_type=sa.Text()), nullable=True),
         sa.Column("subcriteria_index", sa.Integer(), nullable=True),
+        sa.Column("source_template_id", sa.UUID(), nullable=True),
         sa.ForeignKeyConstraint(
             ["subcriteria_id"], ["subcriteria.subcriteria_id"], name=op.f("fk_theme_subcriteria_id_subcriteria")
         ),
@@ -156,6 +163,7 @@ def upgrade():
         sa.Column("page_index", sa.Integer(), nullable=True),
         sa.Column("theme_index", sa.Integer(), nullable=True),
         sa.Column("conditions", postgresql.JSON(none_as_null=True, astext_type=sa.Text()), nullable=True),
+        sa.Column("source_template_id", sa.UUID(), nullable=True),
         sa.ForeignKeyConstraint(["page_id"], ["page.page_id"], name=op.f("fk_component_page_id_page")),
         sa.ForeignKeyConstraint(["theme_id"], ["theme.theme_id"], name=op.f("fk_component_theme_id_theme")),
         sa.PrimaryKeyConstraint("component_id", name=op.f("pk_component")),

@@ -1,9 +1,15 @@
+from uuid import uuid4
+
 import pytest
 
-from app.question_reuse.generate_form import build_conditions
+from app.db.models import Page
+
+# from app.question_reuse.generate_form import build_conditions
+from app.question_reuse.generate_form import build_form_json
 from app.question_reuse.generate_form import build_lists
 from app.question_reuse.generate_form import build_navigation
 from app.question_reuse.generate_form import build_page
+from tests.unit_test_data import *
 
 LIST1 = {
     "type": "string",
@@ -156,20 +162,24 @@ mock_pages = [
 
 
 @pytest.mark.parametrize(
-    "input_page_name, exp_result",
+    "input_page, exp_result",
     [
         (
-            "organisation-single-name",
+            Page(
+                page_id=uuid4(),
+                form_id=uuid4(),
+                display_path="organisation-single-name",
+                name_in_apply={"en": "Organisation Name"},
+                form_index=1,
+                components=[mock_c_1],
+            ),
             {
                 "path": "/organisation-single-name",
                 "title": "Organisation Name",
                 "components": [
                     {
-                        "name": "reuse-organisation-name",
-                        "options": {
-                            "hideTitle": False,
-                            "classes": "govuk-!-width-full",
-                        },
+                        "name": str(mock_c_1.component_id),
+                        "options": {},
                         "type": "TextField",
                         "title": "Organisation name",
                         "hint": "This must match your registered legal organisation name",
@@ -182,10 +192,8 @@ mock_pages = [
         )
     ],
 )
-def test_build_page(mocker, input_page_name, exp_result):
-    mocker.patch("app.data.data_access.COMPONENTS", mock_components)
-    mocker.patch("app.data.data_access.PAGES", mock_pages)
-    result = build_page(input_page_name)
+def test_build_page(mocker, input_page, exp_result):
+    result = build_page(input_page)
     assert result == exp_result
 
 
@@ -290,15 +298,24 @@ def test_build_page(mocker, input_page_name, exp_result):
     ],
 )
 def test_build_conditions(input_name, input_component, exp_results):
-    results = build_conditions(input_name, input_component)
-    assert results == exp_results
+    assert False, "Rewrite conditions stuff"
+    # results = build_conditions(input_name, input_component)
+    # assert results == exp_results
 
 
 @pytest.mark.parametrize(
-    "page_names,pages ,exp_next",
+    "input_pages,input_partial_json, exp_next",
     [
         (
-            ["organisation-single-name"],
+            [
+                Page(
+                    page_id=uuid4(),
+                    form_id=uuid4(),
+                    display_path="organisation-single-name",
+                    name_in_apply={"en": "Organisation Name"},
+                    form_index=1,
+                )
+            ],
             {
                 "conditions": [],
                 "pages": [
@@ -328,7 +345,22 @@ def test_build_conditions(input_name, input_component, exp_results):
             },
         ),
         (
-            ["organisation-single-name", "organisation-charitable-objects"],
+            [
+                Page(
+                    page_id=uuid4(),
+                    form_id=uuid4(),
+                    display_path="organisation-single-name",
+                    name_in_apply={"en": "Organisation Name"},
+                    form_index=1,
+                ),
+                Page(
+                    page_id=uuid4(),
+                    form_id=uuid4(),
+                    display_path="organisation-charitable-objects",
+                    name_in_apply={"en": "What are your organisation's charitable objects?"},
+                    form_index=1,
+                ),
+            ],
             {
                 "conditions": [],
                 "pages": [
@@ -375,11 +407,9 @@ def test_build_conditions(input_name, input_component, exp_results):
         ),
     ],
 )
-def test_build_navigation_no_conditions(mocker, pages, page_names, exp_next):
-    mocker.patch("app.data.data_access.COMPONENTS", mock_components)
-    mocker.patch("app.data.data_access.PAGES", mock_pages)
+def test_build_navigation_no_conditions(mocker, input_partial_json, input_pages, exp_next):
 
-    results = build_navigation(pages, page_names)
+    results = build_navigation(partial_form_json=input_partial_json, input_pages=input_pages)
     for page in results["pages"]:
         exp_next_this_page = exp_next[page["path"]]
         assert page["next"] == exp_next_this_page
@@ -458,9 +488,61 @@ def test_build_navigation_no_conditions(mocker, pages, page_names, exp_next):
 def test_build_navigation_with_conditions(mocker, pages, page_names, exp_next, exp_conditions):
     mocker.patch("app.data.data_access.COMPONENTS", mock_components)
     mocker.patch("app.data.data_access.PAGES", mock_pages)
+    assert False, "Rewrite with conditions stuff"
+    # results = build_navigation(pages, page_names)
+    # for page in results["pages"]:
+    #     exp_next_this_page = exp_next[page["path"]]
+    #     for next in page["next"]:
+    #         assert next in exp_next_this_page
 
-    results = build_navigation(pages, page_names)
-    for page in results["pages"]:
-        exp_next_this_page = exp_next[page["path"]]
-        for next in page["next"]:
-            assert next in exp_next_this_page
+
+@pytest.mark.parametrize(
+    "input_form, exp_results",
+    [
+        (
+            mock_form_1,
+            {
+                "startPage": "/intro-a-test-form",
+                "pages": [
+                    {
+                        "path": "/intro-a-test-form",
+                        "title": "A test form",
+                        "next": [{"path": "/test-display-path"}],
+                    },
+                    {
+                        "path": "/test-display-path",
+                        "title": "A test page",
+                        "next": [
+                            {
+                                "path": "/summary",
+                            },
+                        ],
+                        "exp_component_count": 2,
+                    },
+                    {
+                        "path": "/summary",
+                        "title": "Check your answers",
+                        "next": [],
+                        "exp_component_count": 0,
+                    },
+                ],
+            },
+        ),
+    ],
+)
+def test_build_form(input_form, exp_results):
+    results = build_form_json(form=input_form)
+    assert results
+    assert len(results["pages"]) == len(exp_results["pages"])
+    assert results["name"] == input_form.name_in_apply["en"]
+    for exp_page in exp_results["pages"]:
+        result_page = next((res_page for res_page in results["pages"] if res_page["path"] == exp_page["path"]), None)
+        assert result_page, f"{exp_page['path']}"
+        assert result_page["title"] == exp_page["title"]
+        if "exp_component_count" in exp_page:
+            assert len(result_page["components"]) == exp_page["exp_component_count"]
+        if "next" in exp_page:
+            for exp_next in exp_page["next"]:
+                assert exp_next["path"] in [next["path"] for next in result_page["next"]]
+                if "condition" in exp_next:
+                    assert exp_next["condition"] in [next["condition"] for next in result_page["next"]]
