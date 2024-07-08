@@ -26,8 +26,9 @@ with open("./app/question_reuse/test_data/in/test-org-info-field-info.json") as 
     TEST_FIELD_INFO = json.load(f)
 
 
-def test_build_basic_structure():
-
+def test_build_basic_structure(mocker):
+    mocker.patch("app.question_reuse.generate_assessment_config.get_form_for_component", return_value=mock_form_1)
+    
     results = build_assessment_config([cri1])
     assert "unscored_sections" in results
     unscored = next(section for section in results["unscored_sections"] if section["id"] == crit_1_id)

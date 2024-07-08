@@ -83,7 +83,7 @@ def init_data():
         display_path="organisation-address",
         form_id=f1.form_id,
         name_in_apply={"en": "Organisation Address"},
-        form_index=2,
+        form_index=3,
     )
     p3: Page = Page(
         page_id=uuid4(),
@@ -91,6 +91,13 @@ def init_data():
         display_path="lead-contact-details",
         name_in_apply={"en": "Lead Contact Details"},
         form_index=1,
+    )
+    p4: Page = Page(
+        page_id=uuid4(),
+        form_id=f2.form_id,
+        display_path="organisation-alternative-names",
+        name_in_apply={"en": "Alternative names of your organisation"},
+        form_index=2,
     )
     cri1: Criteria = Criteria(criteria_id=uuid4(), index=1, round_id=r.round_id, name="Unscored", weighting=0.0)
     sc1: Subcriteria = Subcriteria(
@@ -117,7 +124,7 @@ def init_data():
         type=ComponentType.EMAIL_ADDRESS_FIELD,
         page_index=2,
         theme_id=t2.theme_id,
-        theme_index=3,
+        theme_index=4,
         options={"hideTitle": False, "classes": ""},
     )
     c6: Component = Component(
@@ -127,7 +134,7 @@ def init_data():
         type=ComponentType.UK_ADDRESS_FIELD,
         page_index=3,
         theme_id=t2.theme_id,
-        theme_index=2,
+        theme_index=3,
         options={"hideTitle": False, "classes": ""},
     )
     c1: Component = Component(
@@ -150,6 +157,20 @@ def init_data():
         theme_id=t1.theme_id,
         theme_index=2,
         options={"hideTitle": False, "classes": ""},
+        conditions=[
+            {
+                "name": "organisation_other_names_no",
+                "value": "false",  # this must be lowercaes or the navigation doesn't work
+                "operator": "is",
+                "destination_page_path": "CONTINUE",
+            },
+            {
+                "name": "organisation_other_names_yes",
+                "value": "true",  # this must be lowercaes or the navigation doesn't work
+                "operator": "is",
+                "destination_page_path": "organisation-alternative-names",
+            },
+        ],
     )
     c2: Component = Component(
         component_id=uuid4(),
@@ -159,7 +180,17 @@ def init_data():
         type=ComponentType.UK_ADDRESS_FIELD,
         page_index=1,
         theme_id=t1.theme_id,
-        theme_index=3,
+        theme_index=5,
+        options={"hideTitle": False, "classes": ""},
+    )
+    c7: Component = Component(
+        component_id=uuid4(),
+        page_id=p4.page_id,
+        title="Alternative Name 1",
+        type=ComponentType.TEXT_FIELD,
+        page_index=1,
+        theme_id=t1.theme_id,
+        theme_index=2,
         options={"hideTitle": False, "classes": ""},
     )
     return {

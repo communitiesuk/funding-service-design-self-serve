@@ -2,15 +2,16 @@ from uuid import uuid4
 
 import pytest
 
-from app.db.models import Page
+from app.db.models import Page, Component, ComponentType
 
 # from app.question_reuse.generate_form import build_conditions
 from app.question_reuse.generate_form import build_form_json
 from app.question_reuse.generate_form import build_lists
 from app.question_reuse.generate_form import build_navigation
-from app.question_reuse.generate_form import build_page
+from app.question_reuse.generate_form import build_page, build_conditions
 from tests.unit_test_data import *
 
+# TODO sort out lists
 LIST1 = {
     "type": "string",
     "items": [{"text": "Hello", "value": "h"}, {"text": "goodbye", "value": "g"}],
@@ -197,20 +198,22 @@ def test_build_page(mocker, input_page, exp_result):
     assert result == exp_result
 
 
+id = uuid4()
+id2 = uuid4()
+
+
 @pytest.mark.parametrize(
-    "input_name, input_component, exp_results",
+    "input_component, exp_results",
     [
         (
-            "test_component",
-            {
-                "conditions": [
+            Component(
+                component_id=id,
+                title="test_title",
+                type=ComponentType.TEXT_FIELD,
+                conditions=[
                     {"name": "test_condition", "operator": "is", "value": "yes"},
                 ],
-                "json_snippet": {
-                    "type": "test_type",
-                    "title": "test_title",
-                },
-            },
+            ),
             [
                 {
                     "displayName": "test_condition",
@@ -220,8 +223,8 @@ def test_build_page(mocker, input_page, exp_result):
                         "conditions": [
                             {
                                 "field": {
-                                    "name": "test_component",
-                                    "type": "test_type",
+                                    "name": str(id),
+                                    "type": "TextField",
                                     "display": "test_title",
                                 },
                                 "operator": "is",
@@ -237,17 +240,15 @@ def test_build_page(mocker, input_page, exp_result):
             ],
         ),
         (
-            "test_component2",
-            {
-                "conditions": [
+            Component(
+                component_id=id2,
+                title="test_title_2",
+                type=ComponentType.TEXT_FIELD,
+                conditions=[
                     {"name": "test_condition", "operator": "is", "value": "yes"},
                     {"name": "test_condition2", "operator": "is", "value": "no"},
                 ],
-                "json_snippet": {
-                    "type": "test_type",
-                    "title": "test_title",
-                },
-            },
+            ),
             [
                 {
                     "displayName": "test_condition",
@@ -257,9 +258,9 @@ def test_build_page(mocker, input_page, exp_result):
                         "conditions": [
                             {
                                 "field": {
-                                    "name": "test_component2",
-                                    "type": "test_type",
-                                    "display": "test_title",
+                                    "name": str(id2),
+                                    "type": "TextField",
+                                    "display": "test_title_2",
                                 },
                                 "operator": "is",
                                 "value": {
@@ -279,9 +280,9 @@ def test_build_page(mocker, input_page, exp_result):
                         "conditions": [
                             {
                                 "field": {
-                                    "name": "test_component2",
-                                    "type": "test_type",
-                                    "display": "test_title",
+                                    "name": str(id2),
+                                    "type": "TextField",
+                                    "display": "test_title_2",
                                 },
                                 "operator": "is",
                                 "value": {
@@ -297,10 +298,9 @@ def test_build_page(mocker, input_page, exp_result):
         ),
     ],
 )
-def test_build_conditions(input_name, input_component, exp_results):
-    assert False, "Rewrite conditions stuff"
-    # results = build_conditions(input_name, input_component)
-    # assert results == exp_results
+def test_build_conditions(input_component, exp_results):
+    results = build_conditions(input_component)
+    assert results == exp_results
 
 
 @pytest.mark.parametrize(
@@ -417,10 +417,46 @@ def test_build_navigation_no_conditions(mocker, input_partial_json, input_pages,
 
 
 @pytest.mark.parametrize(
-    "page_names,pages ,exp_next, exp_conditions",
+    "input_pages,input_partial_json ,exp_next, exp_conditions",
     [
         (
-            ["organisation-name", "organisation-charitable-objects"],
+            [
+                Page(
+                    page_id=uuid4(),
+                    form_id=uuid4(),
+                    display_path="organisation-name",
+                    name_in_apply={"en": "Organisation Name"},
+                    form_index=1,
+                    components=[
+                        Component(
+                            component_id=id2,
+                            title="test_title_2",
+                            type=ComponentType.TEXT_FIELD,
+                            conditions=[
+                                {
+                                    "name": "organisation_other_names_no",
+                                    "operator": "is",
+                                    "value": "no",
+                                    "destination_page_path": "CONTINUE",
+                                },
+                                {
+                                    "name": "organisation_other_names_yes",
+                                    "operator": "is",
+                                    "value": "yes",
+                                    "destination_page_path": "organisation-alternative-names",
+                                },
+                            ],
+                        )
+                    ],
+                ),
+                # Page(
+                #     page_id=uuid4(),
+                #     form_id=uuid4(),
+                #     display_path="organisation-alternative-names",
+                #     name_in_apply={"en": "Organisation Alternative Names"},
+                #     form_index=2,
+                # ),
+            ],
             {
                 "conditions": [],
                 "pages": [
@@ -429,71 +465,113 @@ def test_build_navigation_no_conditions(mocker, input_partial_json, input_pages,
                         "title": "Organisation Name",
                         "components": [
                             {
-                                "name": "reuse-organisation-name",
-                                "options": {
-                                    "hideTitle": False,
-                                    "classes": "govuk-!-width-full",
-                                },
-                                "type": "TextField",
-                                "title": "Organisation name",
-                                "hint": "This must match your registered legal organisation name",
-                                "schema": {},
+                                # "name": "reuse-organisation-name",
+                                # "options": {
+                                #     "hideTitle": False,
+                                #     "classes": "govuk-!-width-full",
+                                # },
+                                # "type": "TextField",
+                                # "title": "Organisation name",
+                                # "hint": "This must match your registered legal organisation name",
+                                # "schema": {},
                             },
                             {
-                                "name": "reuse_organisation_other_names_yes_no",
-                                "options": {},
-                                "type": "YesNoField",
-                                "title": "Does your organisation use any other names?",
-                                "schema": {},
+                                # "name": "reuse_organisation_other_names_yes_no",
+                                # "options": {},
+                                # "type": "YesNoField",
+                                # "title": "Does your organisation use any other names?",
+                                # "schema": {},
                             },
                         ],
                         "next": [],
                         "options": {},
                     },
-                    {
-                        "path": "/organisation-charitable-objects",
-                        "title": "Organisation Charitable Objects",
-                        "components": [
-                            {
-                                "name": "reuse-charitable-objects",
-                                "options": {"hideTitle": True, "maxWords": "500"},
-                                "type": "FreeTextField",
-                                "title": "What are your organisation's charitable objects?",
-                                "hint": "You can find this in your organisation's governing document.",
-                            },
-                        ],
-                        "next": [],
-                        "options": {},
-                    },
+                    # {
+                    #     "path": "/organisation-alternative-names",
+                    #     "title": "Organisation Alternative Names",
+                    #     "components": [
+                    #         # {
+                    #         #     "name": "reuse-charitable-objects",
+                    #         #     "options": {"hideTitle": True, "maxWords": "500"},
+                    #         #     "type": "FreeTextField",
+                    #         #     "title": "What are your organisation's charitable objects?",
+                    #         #     "hint": "You can find this in your organisation's governing document.",
+                    #         # },
+                    #     ],
+                    #     "next": [],
+                    #     "options": {},
+                    # },
                 ],
             },
             {
                 "/organisation-name": [
                     {
-                        "path": "/organisation-charitable-objects",
+                        "path": "/summary",
                         "condition": "organisation_other_names_no",
                     },
                     {
-                        "path": "/alternative-organisation-name",
+                        "path": "/organisation-alternative-names",
                         "condition": "organisation_other_names_yes",
                     },
                 ],
-                "/organisation-charitable-objects": [{"path": "/summary"}],
-                "/alternative-organisation-name": [{"path": "/organisation-charitable-objects"}],
+                "/organisation-alternative-names": [{"path": "/summary"}],
             },
-            {},
+            [
+                {
+                    "displayName": "organisation_other_names_no",
+                    "name": "organisation_other_names_no",
+                    "value": {
+                        "name": "organisation_other_names_no",
+                        "conditions": [
+                            {
+                                "field": {
+                                    "name": str(id2),
+                                    "type": "TextField",
+                                    "display": "test_title_2",
+                                },
+                                "operator": "is",
+                                "value": {
+                                    "type": "Value",
+                                    "value": "no",
+                                    "display": "no",
+                                },
+                            }
+                        ],
+                    },
+                },
+                {
+                    "displayName": "organisation_other_names_yes",
+                    "name": "organisation_other_names_yes",
+                    "value": {
+                        "name": "organisation_other_names_yes",
+                        "conditions": [
+                            {
+                                "field": {
+                                    "name": str(id2),
+                                    "type": "TextField",
+                                    "display": "test_title_2",
+                                },
+                                "operator": "is",
+                                "value": {
+                                    "type": "Value",
+                                    "value": "yes",
+                                    "display": "yes",
+                                },
+                            }
+                        ],
+                    },
+                },
+            ],
         )
     ],
 )
-def test_build_navigation_with_conditions(mocker, pages, page_names, exp_next, exp_conditions):
-    mocker.patch("app.data.data_access.COMPONENTS", mock_components)
-    mocker.patch("app.data.data_access.PAGES", mock_pages)
-    assert False, "Rewrite with conditions stuff"
-    # results = build_navigation(pages, page_names)
-    # for page in results["pages"]:
-    #     exp_next_this_page = exp_next[page["path"]]
-    #     for next in page["next"]:
-    #         assert next in exp_next_this_page
+def test_build_navigation_with_conditions(mocker, input_pages,input_partial_json, exp_next, exp_conditions):
+    mocker.patch("app.question_reuse.generate_form.build_page", return_value={"path":"/organisation-alternative-names", "next":[]})
+    results = build_navigation(partial_form_json=input_partial_json, input_pages=input_pages)
+    for page in results["pages"]:
+        exp_next_this_page = exp_next[page["path"]]
+        assert page["next"] == exp_next_this_page
+    assert results["conditions"] == exp_conditions
 
 
 @pytest.mark.parametrize(

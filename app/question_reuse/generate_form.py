@@ -6,7 +6,7 @@ import click
 
 from app.data.data_access import get_list_by_id
 from app.db.models import Form
-from app.db.models import Page
+from app.db.models import Page, Component
 
 BASIC_FORM_STRUCTURE = {
     "metadata": {},
@@ -49,10 +49,9 @@ SUMMARY_PAGE = {
 
 
 # Takes in a simple set of conditions and builds them into the form runner format
-def build_conditions(component_name, component: dict) -> list:
+def build_conditions(component:Component) -> list:
     results = []
-    for condition in component["conditions"]:
-        json = component["json_snippet"]
+    for condition in component.conditions:
         result = {
             "displayName": condition["name"],
             "name": condition["name"],
@@ -61,9 +60,9 @@ def build_conditions(component_name, component: dict) -> list:
                 "conditions": [
                     {
                         "field": {
-                            "name": component_name,
-                            "type": json["type"],
-                            "display": json["title"],
+                            "name": str(component.component_id),
+                            "type": component.type.value,
+                            "display": component.title,
                         },
                         "operator": condition["operator"],
                         "value": {
@@ -121,37 +120,37 @@ def build_navigation(partial_form_json: dict, input_pages: list[Page]) -> dict:
         this_page_in_results = next(p for p in partial_form_json["pages"] if p["path"] == f"/{this_page.display_path}")
 
         has_conditions = False
-        # TODO restore conditions
-        # for component in this_page.components:
-        # if "conditions" in component:
 
-        #     form_json_conditions = build_conditions(component.title, component)
-        #     has_conditions = True
-        #     partial_form_json["conditions"].extend(form_json_conditions)
+        for component in this_page.components:
+            if not component.conditions:
+                continue
+            form_json_conditions = build_conditions(component)
+            has_conditions = True
+            partial_form_json["conditions"].extend(form_json_conditions)
 
-        # for condition in component.conditions:
-        #     if condition["destination_page"] == "CONTINUE":
-        #         destination_path = f"/{next_path}"
-        #     else:
-        #         destination_path = f"/{condition['destination_page']}"
+            for condition in component.conditions:
+                if condition["destination_page_path"] == "CONTINUE":
+                    destination_path = f"/{next_path}"
+                else:
+                    destination_path = f"/{condition['destination_page_path']}"
 
-        #     # If this points to a pre-built page flow, add that in now (it won't be in the input)
-        #     if (
-        #         destination_path not in [page["path"] for page in partial_form_json["pages"]]
-        #         and not destination_path == "/summary"
-        #     ):
-        #         sub_page = build_page(destination_path[1:])
-        #         if not sub_page.get("next", None):
-        #             sub_page["next"] = [{"path": f"/{next_path}"}]
+                # If this points to a pre-built page flow, add that in now (it won't be in the input)
+                if (
+                    destination_path not in [page["path"] for page in partial_form_json["pages"]]
+                    and not destination_path == "/summary"
+                ):
+                    sub_page = build_page(destination_path[1:])
+                    if not sub_page.get("next", None):
+                        sub_page["next"] = [{"path": f"/{next_path}"}]
 
-        #         partial_form_json["pages"].append(sub_page)
+                    partial_form_json["pages"].append(sub_page)
 
-        #     this_page_in_results["next"].append(
-        #         {
-        #             "path": destination_path,
-        #             "condition": condition["name"],
-        #         }
-        #     )
+                this_page_in_results["next"].append(
+                    {
+                        "path": destination_path,
+                        "condition": condition["name"],
+                    }
+                )
 
         # If there were no conditions and we just continue to the next page
         if not has_conditions:
