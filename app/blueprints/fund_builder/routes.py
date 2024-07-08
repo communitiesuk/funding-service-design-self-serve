@@ -4,8 +4,12 @@ from flask import Blueprint
 from flask import flash
 from flask import redirect
 from flask import render_template
-from flask import request
+from flask import request, Response
+import json
 from flask import url_for
+from random import randint
+
+import requests
 
 from app.blueprints.fund_builder.forms.fund import FundForm
 from app.blueprints.fund_builder.forms.round import RoundForm
@@ -17,12 +21,22 @@ from app.db.queries.fund import get_fund_by_id
 from app.db.queries.round import add_round
 from app.db.queries.round import get_round_by_id
 
+from app.db.queries.application import get_form_by_id
+
+from app.question_reuse.generate_form import build_form_json
+import os
+
 build_fund_bp = Blueprint(
     "build_fund_bp",
     __name__,
     url_prefix="/",
     template_folder="templates",
 )
+# TODO get these from config
+FUND_BUILDER_HOST = "fsd-self-serve:8080" 
+FORM_RUNNER_URL = os.getenv("FORM_RUNNER_INTERNAL_HOST", "http://form-runner:3009")
+FORM_RUNNER_URL_REDIRECT = os.getenv("FORM_RUNNER_EXTERNAL_HOST", "http://localhost:3009")
+
 
 
 def all_funds_as_govuk_select_items(all_funds: list) -> list:
@@ -102,4 +116,35 @@ def round():
         "round.html",
         form=form,
         all_funds=all_funds_as_govuk_select_items(all_funds),
+    )
+
+
+@build_fund_bp.route("/preview/<form_id>", methods=["GET"])
+def preview_form(form_id):
+    form = get_form_by_id(form_id)
+    form_json = build_form_json(form)
+    form_json["outputs"][0]["outputConfiguration"][
+        "savePerPageUrl"
+    ] = f"http://{FUND_BUILDER_HOST}/dev/save"
+    try:
+        publish_response = requests.post(
+            url=f"{FORM_RUNNER_URL}/publish", json={"id": form.runner_publish_name, "configuration": form_json}
+        )
+        if not str(publish_response.status_code).startswith("2"):
+            return "Error during form publish", 500
+    except Exception as e:
+        return f"unable to publish form: {str(e)}", 500
+    return redirect(f"{FORM_RUNNER_URL_REDIRECT}/{form.runner_publish_name}")
+
+@build_fund_bp.route("/download/<form_id>", methods=["GET"])
+def download_form_json(form_id):
+    form = get_form_by_id(form_id)
+    form_json = build_form_json(form)
+    form_json["outputs"][0]["outputConfiguration"][
+        "savePerPageUrl"
+    ] = f"http://localhost:5000/dev/save"
+    return Response(
+        response=json.dumps(form_json),
+        mimetype="application/json",
+        headers={"Content-Disposition": f"attachment;filename=form-{randint(0,999)}.json"},
     )

@@ -78,6 +78,9 @@ class Form(BaseModel):
     source_template_id = Column(UUID(as_uuid=True), nullable=True)
 
 
+    def __repr__(self):
+        return f"Form({self.runner_publish_name} - {self.name_in_apply['en']}, Pages: {self.pages})"
+
 @dataclass
 class Page(BaseModel):
 
@@ -101,6 +104,9 @@ class Page(BaseModel):
     display_path = Column("display_path", String())
     components: Mapped[List["Component"]] = relationship("Component")
     source_template_id = Column(UUID(as_uuid=True), nullable=True)
+
+    def __repr__(self):
+        return f"Page(/{self.display_path} - {self.name_in_apply['en']}, Components: {self.components})"
 
 
 @dataclass
@@ -135,6 +141,10 @@ class Component(BaseModel):
     theme_index = Column(Integer())
     conditions = Column(JSON(none_as_null=True))
     source_template_id = Column(UUID(as_uuid=True), nullable=True)
+    runner_component_name = Column(String(), nullable=False ) #TODO add validation to make sure it's only letters, numbers and _
+
+    def __repr__(self):
+        return f"Component({self.title}, {self.type.value})"
 
     @property
     def assessment_display_type(self):

@@ -94,7 +94,7 @@ def init_data():
     )
     p4: Page = Page(
         page_id=uuid4(),
-        form_id=f2.form_id,
+        form_id=None,
         display_path="organisation-alternative-names",
         name_in_apply={"en": "Alternative names of your organisation"},
         form_index=2,
@@ -133,6 +133,7 @@ def init_data():
         theme_id=t2.theme_id,
         theme_index=1,
         options={"hideTitle": False, "classes": ""},
+        runner_component_name="main_contact_name"
     )
     c5: Component = Component(
         component_id=uuid4(),
@@ -143,6 +144,7 @@ def init_data():
         theme_id=t2.theme_id,
         theme_index=4,
         options={"hideTitle": False, "classes": ""},
+        runner_component_name="main_contact_email"
     )
     c6: Component = Component(
         component_id=uuid4(),
@@ -153,6 +155,7 @@ def init_data():
         theme_id=t2.theme_id,
         theme_index=3,
         options={"hideTitle": False, "classes": ""},
+        runner_component_name="main_contact_address"
     )
     c1: Component = Component(
         component_id=uuid4(),
@@ -164,6 +167,7 @@ def init_data():
         theme_id=t1.theme_id,
         theme_index=1,
         options={"hideTitle": False, "classes": ""},
+        runner_component_name="organisation_name"
     )
     c3: Component = Component(
         component_id=uuid4(),
@@ -174,6 +178,7 @@ def init_data():
         theme_id=t1.theme_id,
         theme_index=2,
         options={"hideTitle": False, "classes": ""},
+        runner_component_name="does_your_organisation_use_other_names",
         conditions=[
             {
                 "name": "organisation_other_names_no",
@@ -199,6 +204,7 @@ def init_data():
         theme_id=t1.theme_id,
         theme_index=5,
         options={"hideTitle": False, "classes": ""},
+        runner_component_name="organisation_address"
     )
     c7: Component = Component(
         component_id=uuid4(),
@@ -209,6 +215,7 @@ def init_data():
         theme_id=t1.theme_id,
         theme_index=2,
         options={"hideTitle": False, "classes": ""},
+        runner_component_name="alt_name_1"
     )
     return {
         "funds": [f],
@@ -216,7 +223,7 @@ def init_data():
         "sections": [s1],
         "forms": [f1, f2],
         "pages": [p1, p2, p3, template_page, non_template_page, p4],
-        "components": [c1, c2, c3, c4, c5, c6],
+        "components": [c1, c2, c3, c4, c5, c6, c7],
         "criteria": [cri1],
         "subcriteria": [sc1],
         "themes": [t1, t2],

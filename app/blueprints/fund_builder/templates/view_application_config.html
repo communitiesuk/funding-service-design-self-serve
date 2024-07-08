@@ -16,12 +16,26 @@
                 <h3 class="govuk-heading-s">{{ section.index }}. {{ section.name_in_apply["en"] }}</h3>
                 {% for form in section.forms %}
                     <h4 class="govuk-heading-s">Form {{ form.section_index }}. {{ form.name_in_apply["en"] }}</h4>
+                    {{ govukButton({
+                        "text": "Preview Form",
+                        "href": url_for("build_fund_bp.preview_form", form_id=form.form_id),
+                        "classes": "govuk-button--secondary"
+                    })
+                    }}
+                    {{ govukButton({
+                        "text": "Download JSON",
+                        "href": url_for("build_fund_bp.download_form_json", form_id=form.form_id),
+                        "classes": "govuk-button--secondary"
+                    })
+                    }}
                     {% for page in form.pages %}
-                        <div class="section_page"><span class="govuk-body">{{ page.form_index }}. {{ page.name_in_apply["en"] }}</span>
+                        <div class="section_page">
+                            <span class="govuk-body">{{ page.form_index }}. {{ page.name_in_apply["en"] }}</span>
                             <ul class="govuk-list--bullet">
-                            {%for component in page.components %}
-                                <li class="govuk-body">{{component.page_index}} - {{component.title}} ({{component.type.value}})</li>
-                            {% endfor %}</ul>
+                                {% for component in page.components %}
+                                    <li class="govuk-body">{{ component.page_index }} - {{ component.title }} ({{ component.type.value }})</li>
+                                {% endfor %}
+                            </ul>
                         </div>
                     {% endfor %}
                 {% endfor %}

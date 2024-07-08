@@ -61,7 +61,7 @@ def build_conditions(component:Component) -> list:
                 "conditions": [
                     {
                         "field": {
-                            "name": str(component.component_id),
+                            "name": component.runner_component_name,
                             "type": component.type.value,
                             "display": component.title,
                         },
@@ -80,6 +80,17 @@ def build_conditions(component:Component) -> list:
     return results
 
 
+def build_component(component:Component) -> dict:
+    return {
+            "options": component.options or {},
+            "type": component.type.value,
+            "title": component.title,
+            "hint": component.hint_text or "",
+            "schema": {},
+            "name": component.runner_component_name,
+            "metadata": {"fund_builder_id": str(component.component_id)},
+        }
+
 def build_page(page: Page = None, page_display_path: str = None) -> dict:
     if not page:
         page = get_template_page_by_display_path(page_display_path)
@@ -94,14 +105,7 @@ def build_page(page: Page = None, page_display_path: str = None) -> dict:
     # if controller := input_page.get("controller", None):
     #     page["controller"] = controller
     for component in page.components:
-        built_component = {
-            "options": component.options or {},
-            "type": component.type.value,
-            "title": component.title,
-            "hint": component.hint_text,
-            "schema": {},
-            "name": str(component.component_id),
-        }
+        built_component = build_component(component)
 
         built_page["components"].append(built_component)
 
