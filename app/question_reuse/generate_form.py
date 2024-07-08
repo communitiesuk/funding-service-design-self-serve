@@ -5,6 +5,7 @@ import os
 import click
 
 from app.data.data_access import get_list_by_id
+from app.db.queries.application import get_template_page_by_display_path
 from app.db.models import Form
 from app.db.models import Page, Component
 
@@ -79,7 +80,9 @@ def build_conditions(component:Component) -> list:
     return results
 
 
-def build_page(page: Page) -> dict:
+def build_page(page: Page = None, page_display_path: str = None) -> dict:
+    if not page:
+        page = get_template_page_by_display_path(page_display_path)
     built_page = copy.deepcopy(BASIC_PAGE_STRUCTURE)
     built_page.update(
         {
@@ -139,7 +142,7 @@ def build_navigation(partial_form_json: dict, input_pages: list[Page]) -> dict:
                     destination_path not in [page["path"] for page in partial_form_json["pages"]]
                     and not destination_path == "/summary"
                 ):
-                    sub_page = build_page(destination_path[1:])
+                    sub_page = build_page(page_display_path=destination_path[1:])
                     if not sub_page.get("next", None):
                         sub_page["next"] = [{"path": f"/{next_path}"}]
 
@@ -199,7 +202,7 @@ def build_form_json(form: Form) -> dict:
     results["name"] = form.name_in_apply["en"]
 
     for page in form.pages:
-        results["pages"].append(build_page(page))
+        results["pages"].append(build_page(page=page))
 
     start_page = copy.deepcopy(BASIC_PAGE_STRUCTURE)
     start_page.update(

@@ -54,17 +54,25 @@ def test_build_form_json(sort_out_test_data):
 
     result = build_form_json(form=form)
     assert result
-    assert len(result["pages"]) == 4
+    assert len(result["pages"]) == 5
     exp_start_path = "/intro-about-your-organisation"
     exp_second_path = "/organisation-name"
     assert result["startPage"] == exp_start_path
     intro_page = next((p for p in result["pages"] if p["path"] == exp_start_path), None)
     assert intro_page
     assert intro_page["next"][0]["path"] == exp_second_path
-    assert next((p for p in result["pages"] if p["path"] == exp_second_path), None)
-    third_page = next((p for p in result["pages"] if p["path"] == "/organisation-address"), None)
-    assert third_page
-    assert third_page["next"][0]["path"] == "/summary"
+
+    org_name_page = next((p for p in result["pages"] if p["path"] == exp_second_path), None)
+    assert org_name_page
+    assert len(org_name_page["next"]) == 2
+
+    alt_names_page = next((p for p in result["pages"] if p["path"] == "/organisation-alternative-names"), None)
+    assert alt_names_page
+    assert alt_names_page["next"][0]["path"] == "/organisation-address"
+
+    address_page = next((p for p in result["pages"] if p["path"] == "/organisation-address"), None)
+    assert address_page
+    assert address_page["next"][0]["path"] == "/summary"
 
     summary = next((p for p in result["pages"] if p["path"] == "/summary"), None)
     assert summary

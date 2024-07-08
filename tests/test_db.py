@@ -7,13 +7,15 @@ from flask_migrate import upgrade
 from sqlalchemy import text
 
 from app.app import create_app
-from app.db.models.fund import Fund
-from app.db.models.round import Round
+from app.db.models import Fund
+from app.db.models import Round, Page
 from app.db.queries.fund import add_fund
 from app.db.queries.fund import get_all_funds
 from app.db.queries.fund import get_fund_by_id
 from app.db.queries.round import add_round
 from app.db.queries.round import get_round_by_id
+
+from app.db.queries.application import get_template_page_by_display_path
 
 url_base = "postgresql://postgres:password@fsd-self-serve-db:5432/fund_builder"  # pragma: allowlist secret
 
@@ -102,3 +104,33 @@ def test_get_round_by_id(flask_test_client, _db):
     any_round = _db.session.execute(text("select * from round limit 1;")).one()
     result: Round = get_round_by_id(any_round.round_id)
     assert result.title_json == any_round.title_json
+
+
+def test_get_template_page_by_display_path(flask_test_client, _db):
+    _db.session.execute(
+        text("TRUNCATE TABLE fund, round, section,form, page, component, theme, subcriteria, criteria CASCADE;")
+    )
+    _db.session.commit()
+    
+    template_page: Page = Page(
+        page_id=uuid4(),
+        form_id=None,
+        display_path="testing_templates_path",
+        is_template=True,
+        name_in_apply={"en": "Template Path"},
+        form_index=0,
+    )
+    non_template_page: Page = Page(
+        page_id=uuid4(),
+        form_id=None,
+        display_path="testing_templates_path",
+        is_template=False,
+        name_in_apply={"en": "Not Template Path"},
+        form_index=0,
+    )
+   
+    _db.session.bulk_save_objects([template_page, non_template_page])
+    _db.session.commit()
+    result = get_template_page_by_display_path("testing_templates_path")
+    assert result
+    assert result.page_id == template_page.page_id

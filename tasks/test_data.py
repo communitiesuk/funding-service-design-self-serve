@@ -98,6 +98,23 @@ def init_data():
         display_path="organisation-alternative-names",
         name_in_apply={"en": "Alternative names of your organisation"},
         form_index=2,
+        is_template=True
+    )
+    template_page: Page = Page(
+        page_id=uuid4(),
+        form_id=None,
+        display_path="testing_templates_path",
+        is_template=True,
+        name_in_apply={"en": "Template Path"},
+        form_index=0,
+    )
+    non_template_page: Page = Page(
+        page_id=uuid4(),
+        form_id=None,
+        display_path="testing_templates_path",
+        is_template=False,
+        name_in_apply={"en": "Not Template Path"},
+        form_index=0,
     )
     cri1: Criteria = Criteria(criteria_id=uuid4(), index=1, round_id=r.round_id, name="Unscored", weighting=0.0)
     sc1: Subcriteria = Subcriteria(
@@ -198,7 +215,7 @@ def init_data():
         "rounds": [r, r2],
         "sections": [s1],
         "forms": [f1, f2],
-        "pages": [p1, p2, p3],
+        "pages": [p1, p2, p3, template_page, non_template_page, p4],
         "components": [c1, c2, c3, c4, c5, c6],
         "criteria": [cri1],
         "subcriteria": [sc1],
