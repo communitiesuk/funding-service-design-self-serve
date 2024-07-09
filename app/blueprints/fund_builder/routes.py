@@ -24,6 +24,8 @@ from app.db.queries.round import get_round_by_id
 from app.db.queries.application import get_form_by_id
 
 from app.question_reuse.generate_form import build_form_json
+from app.question_reuse.generate_all_questions import print_html
+from app.all_questions.metadata_utils import generate_print_data_for_sections
 import os
 
 build_fund_bp = Blueprint(
@@ -148,3 +150,20 @@ def download_form_json(form_id):
         mimetype="application/json",
         headers={"Content-Disposition": f"attachment;filename=form-{randint(0,999)}.json"},
     )
+
+@build_fund_bp.route("/fund/round/<round_id>/all_questions", methods=["GET"])
+def view_all_questions(round_id):
+    round = get_round_by_id(round_id)
+    fund = get_fund_by_id(round.fund_id)
+    sections_in_round = round.sections
+    section_data = []
+    for section in sections_in_round:
+        forms=[{"name": form.runner_publish_name, "form_data":build_form_json(form)} for form in section.forms]
+        section_data.append({"section_title": section.name_in_apply["en"], "forms": forms})
+        
+    print_data = generate_print_data_for_sections(
+        section_data,
+        lang="en",
+    )
+    html = print_html(print_data)
+    return render_template("view_questions.html", round=round, fund=fund, question_html=html)

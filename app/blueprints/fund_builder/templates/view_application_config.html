@@ -10,6 +10,12 @@
             <h2 class="govuk-heading-m">{{ fund.short_name }} - {{ round.short_name }}</h2>
         </div>
     </div>
+    {{ govukButton({
+        "text": "View All Questions",
+        "href": url_for("build_fund_bp.view_all_questions", round_id=round.round_id),
+        "classes": "govuk-button--secondary"
+    })
+    }}
     {% for section in round.sections %}
         <div class="govuk-grid-row">
             <div class="govuk-grid-column-full">
