@@ -1,8 +1,8 @@
-"""empty message
+"""Initial version of the FAB database
 
-Revision ID: f66c63999635
+Revision ID: 4247b8f71cff
 Revises:
-Create Date: 2024-07-09 09:39:19.877367
+Create Date: 2024-07-10 10:57:16.171140
 
 """
 
@@ -11,7 +11,7 @@ from alembic import op
 from sqlalchemy.dialects import postgresql
 
 # revision identifiers, used by Alembic.
-revision = "f66c63999635"
+revision = "4247b8f71cff"
 down_revision = None
 branch_labels = None
 depends_on = None
