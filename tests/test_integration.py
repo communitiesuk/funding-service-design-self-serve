@@ -89,7 +89,7 @@ def test_build_form_json(sort_out_test_data):
     assert summary
 
 
-# TODO fix this with copying template stuff
+# TODO this fails with components from a template (branching logic)
 def test_build_assessment_config(sort_out_test_data):
     f: Fund = get_all_funds()[0]
     criteria = f.rounds[0].criteria[0]
@@ -100,7 +100,7 @@ def test_build_assessment_config(sort_out_test_data):
     assert first_unscored["name"] == "Unscored"
     assert len(first_unscored["subcriteria"]) == 1
     assert len(first_unscored["subcriteria"][0]["themes"]) == 2
-    assert len(first_unscored["subcriteria"][0]["themes"][0]["answers"]) == 3
+    assert len(first_unscored["subcriteria"][0]["themes"][0]["answers"]) == 4
     assert len(first_unscored["subcriteria"][0]["themes"][1]["answers"]) == 3
 
 

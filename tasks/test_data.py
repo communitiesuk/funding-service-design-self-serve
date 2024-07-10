@@ -220,8 +220,8 @@ def init_data():
         title="Alternative Name 1",
         type=ComponentType.TEXT_FIELD,
         page_index=1,
-        theme_id=t1.theme_id,
-        theme_index=2,
+        theme_id=None,
+        theme_index=None,
         options={"hideTitle": False, "classes": ""},
         runner_component_name="alt_name_1",
     )
