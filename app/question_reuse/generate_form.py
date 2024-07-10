@@ -231,7 +231,7 @@ def build_form_json(form: Form) -> dict:
 
     results = build_navigation(results, form.pages)
 
-    results["lists"] = build_lists(results["pages"], form_name=form.runner_publish_name)
+    results["lists"] = build_lists(results["pages"])
 
     results["pages"].append(SUMMARY_PAGE)
 

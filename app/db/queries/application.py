@@ -13,7 +13,12 @@ def get_form_for_component(component: Component) -> Form:
 
 
 def get_template_page_by_display_path(display_path: str) -> Page:
-    page = db.session.query(Page).where(Page.display_path == display_path).where(Page.is_template is True).one_or_none()
+    page = (
+        db.session.query(Page)
+        .where(Page.display_path == display_path)
+        .where(Page.is_template == True)  # noqa:E712
+        .one_or_none()
+    )
     return page
 
 
