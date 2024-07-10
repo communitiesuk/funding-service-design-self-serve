@@ -11,18 +11,18 @@ from flask import request
 from flask import url_for
 
 from app.all_questions.metadata_utils import generate_print_data_for_sections
+from app.blueprints.self_serve.data.data_access import get_all_components
+from app.blueprints.self_serve.data.data_access import get_component_by_name
+from app.blueprints.self_serve.data.data_access import get_pages_to_display_in_builder
+from app.blueprints.self_serve.data.data_access import get_saved_forms
+from app.blueprints.self_serve.data.data_access import save_form
+from app.blueprints.self_serve.data.data_access import save_page
+from app.blueprints.self_serve.data.data_access import save_question
+from app.blueprints.self_serve.data.data_access import save_section
 from app.blueprints.self_serve.forms.form_form import FormForm
 from app.blueprints.self_serve.forms.page_form import PageForm
 from app.blueprints.self_serve.forms.question_form import QuestionForm
 from app.blueprints.self_serve.forms.section_form import SectionForm
-from app.data.data_access import get_all_components
-from app.data.data_access import get_component_by_name
-from app.data.data_access import get_pages_to_display_in_builder
-from app.data.data_access import get_saved_forms
-from app.data.data_access import save_form
-from app.data.data_access import save_page
-from app.data.data_access import save_question
-from app.data.data_access import save_section
 from app.question_reuse.generate_all_questions import print_html
 from app.question_reuse.generate_form import build_form_json
 

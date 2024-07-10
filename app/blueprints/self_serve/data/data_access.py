@@ -1,8 +1,8 @@
-from app.data.not_a_db import COMPONENTS
-from app.data.not_a_db import FORMS
-from app.data.not_a_db import LISTS
-from app.data.not_a_db import PAGES
-from app.data.not_a_db import SECTIONS
+from app.blueprints.self_serve.data.not_a_db import COMPONENTS
+from app.blueprints.self_serve.data.not_a_db import FORMS
+from app.blueprints.self_serve.data.not_a_db import LISTS
+from app.blueprints.self_serve.data.not_a_db import PAGES
+from app.blueprints.self_serve.data.not_a_db import SECTIONS
 
 saved_responses = []
 saved_sections = {}
