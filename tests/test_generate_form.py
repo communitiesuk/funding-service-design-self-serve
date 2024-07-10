@@ -13,14 +13,17 @@ from app.question_reuse.generate_form import build_form_json
 from app.question_reuse.generate_form import build_lists
 from app.question_reuse.generate_form import build_navigation
 from app.question_reuse.generate_form import build_page
+from app.question_reuse.generate_form import human_to_kebab_case
 from tests.unit_test_data import mock_c_1
 from tests.unit_test_data import mock_form_1
 
-# TODO sort out lists
-LIST1 = {
-    "type": "string",
-    "items": [{"text": "Hello", "value": "h"}, {"text": "goodbye", "value": "g"}],
-}
+
+@pytest.mark.parametrize(
+    "input, exp_output", [("", None), ("hello world", "hello-world"), ("Hi There Everyone", "hi-there-everyone")]
+)
+def test_human_to_kebab(input, exp_output):
+    result = human_to_kebab_case(input)
+    assert result == exp_output
 
 
 @pytest.mark.parametrize(

@@ -26,6 +26,7 @@ from app.db.queries.round import get_round_by_id
 from app.question_reuse.generate_all_questions import print_html
 from app.question_reuse.generate_form import build_form_json
 
+# Blueprint for routes used by v1 of FAB - using the DB
 build_fund_bp = Blueprint(
     "build_fund_bp",
     __name__,
@@ -39,11 +40,18 @@ FORM_RUNNER_URL_REDIRECT = os.getenv("FORM_RUNNER_EXTERNAL_HOST", "http://localh
 
 
 def all_funds_as_govuk_select_items(all_funds: list) -> list:
+    """
+    Reformats a list of funds into a list of display/value items that can be passed to a govUk select macro
+    in the html
+    """
     return [{"text": f"{f.short_name} - {f.name_json['en']}", "value": str(f.fund_id)} for f in all_funds]
 
 
 @build_fund_bp.route("/fund/view", methods=["GET", "POST"])
 def view_fund():
+    """
+    Renders a template providing a drop down list of funds. If a fund is selected, renders its config info
+    """
     params = {"all_funds": all_funds_as_govuk_select_items(get_all_funds())}
     if request.method == "POST":
         fund_id = request.form.get("fund_id")
@@ -55,6 +63,9 @@ def view_fund():
 
 @build_fund_bp.route("/fund/round/<round_id>/application_config")
 def view_app_config(round_id):
+    """
+    Renders a template displaying application configuration info for the chosen round
+    """
     round = get_round_by_id(round_id)
     fund = get_fund_by_id(round.fund_id)
     return render_template("view_application_config.html", round=round, fund=fund)
@@ -62,6 +73,9 @@ def view_app_config(round_id):
 
 @build_fund_bp.route("/fund/round/<round_id>/assessment_config")
 def view_assess_config(round_id):
+    """
+    Renders a template displaying assessment configuration info for the chosen round
+    """
     round = get_round_by_id(round_id)
     fund = get_fund_by_id(round.fund_id)
     return render_template("view_assessment_config.html", round=round, fund=fund)
@@ -69,6 +83,9 @@ def view_assess_config(round_id):
 
 @build_fund_bp.route("/fund", methods=["GET", "POST"])
 def fund():
+    """
+    Renders a template to allow a user to add a fund, when saved validates the form data and saves to DB
+    """
     form: FundForm = FundForm()
     if form.validate_on_submit():
         add_fund(
@@ -89,6 +106,10 @@ def fund():
 
 @build_fund_bp.route("/round", methods=["GET", "POST"])
 def round():
+    """
+    Renders a template to select a fund and add a round to that fund. If saved, validates the round form data
+    and saves to DB
+    """
     all_funds = get_all_funds()
     form: RoundForm = RoundForm()
     if form.validate_on_submit():
@@ -120,8 +141,14 @@ def round():
 
 @build_fund_bp.route("/preview/<form_id>", methods=["GET"])
 def preview_form(form_id):
+    """
+    Generates the form json for a chosen form, does not persist this, but publishes it to the form runner using the
+    'runner_publish_name' of that form. Returns a redirect to that form in the form-runner
+    """
     form = get_form_by_id(form_id)
     form_json = build_form_json(form)
+
+    # Update the savePerPageUrl to point at the dev route to save responses
     form_json["outputs"][0]["outputConfiguration"]["savePerPageUrl"] = f"http://{FUND_BUILDER_HOST}/dev/save"
     try:
         publish_response = requests.post(
@@ -136,8 +163,13 @@ def preview_form(form_id):
 
 @build_fund_bp.route("/download/<form_id>", methods=["GET"])
 def download_form_json(form_id):
+    """
+    Generates form json for the selected form and returns it as a file download
+    """
     form = get_form_by_id(form_id)
     form_json = build_form_json(form)
+
+    # TODO what should we set this to?
     form_json["outputs"][0]["outputConfiguration"]["savePerPageUrl"] = "http://localhost:5000/dev/save"
     return Response(
         response=json.dumps(form_json),
@@ -148,6 +180,10 @@ def download_form_json(form_id):
 
 @build_fund_bp.route("/fund/round/<round_id>/all_questions", methods=["GET"])
 def view_all_questions(round_id):
+    """
+    Generates the form data for all sections in the selected round, then uses that to generate the 'All Questions'
+    data for that round and returns that to render in a template.
+    """
     round = get_round_by_id(round_id)
     fund = get_fund_by_id(round.fund_id)
     sections_in_round = round.sections

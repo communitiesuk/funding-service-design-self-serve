@@ -1,3 +1,5 @@
+# TODO reinstate this test when finished changing generate_form
+
 # import pytest
 
 # from app.question_reuse.generate_form import build_form_json
@@ -150,7 +152,8 @@
 #                                 "type": "YesNoField",
 #                                 "title": "Is the lead contact the same person as the authorised signatory?",
 #                                 "hint": "<p class='govuk-hint'>An authorised signatory:"
-#                                 "<ul class='govuk-list govuk-list--bullet govuk-hint'> <li>is allowed to act on behalf"
+#                                 "<ul class='govuk-list govuk-list--bullet govuk-hint'>
+# <li>is allowed to act on behalf"
 #                                 " of the organisation</li> "
 #                                 "<li>will sign the grant funding agreement if your application is "
 #                                 "successful</li></ul></p>",
@@ -212,7 +215,8 @@
 #                                 "options": {},
 #                                 "type": "Html",
 #                                 "content": "<p class='govuk-hint'>An authorised signatory:</p>\\n"
-#                                 "<ul class='govuk-list govuk-list--bullet govuk-hint'>\\n            <li>is allowed to"
+#                                 "<ul class='govuk-list govuk-list--bullet govuk-hint'>\\n
+# <li>is allowed to"
 #                                 " act on behalf of the organisation</li>\\n            <li>will sign the grant "
 #                                 "funding agreement if your application is successful</li>\\n          </ul>",
 #                                 "schema": {},
@@ -459,7 +463,8 @@
 #                                 "name": "xKWJWW",
 #                                 "options": {},
 #                                 "type": "Html",
-#                                 "content": "<p class='govuk-hint'>An authorised signatory:</p>\\n<ul class='govuk-list"
+#                                 "content": "<p class='govuk-hint'>An authorised signatory:</p>\\n
+# <ul class='govuk-list"
 #                                 " govuk-list--bullet govuk-hint'>\\n            <li>is allowed to act on behalf of "
 #                                 "the organisation</li>\\n            <li>will sign the grant funding agreement if "
 #                                 "your application is successful</li>\\n          </ul>",
