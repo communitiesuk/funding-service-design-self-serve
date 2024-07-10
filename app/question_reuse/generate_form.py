@@ -4,10 +4,10 @@ import os
 
 import click
 
-from app.data.data_access import get_list_by_id
+from app.db.queries.application import get_list_by_id
 from app.db.queries.application import get_template_page_by_display_path
 from app.db.models import Form
-from app.db.models import Page, Component
+from app.db.models import Page, Component, Lizt
 
 BASIC_FORM_STRUCTURE = {
     "metadata": {},
@@ -81,7 +81,7 @@ def build_conditions(component:Component) -> list:
 
 
 def build_component(component:Component) -> dict:
-    return {
+    built_component = {
             "options": component.options or {},
             "type": component.type.value,
             "title": component.title,
@@ -90,6 +90,10 @@ def build_component(component:Component) -> dict:
             "name": component.runner_component_name,
             "metadata": {"fund_builder_id": str(component.component_id)},
         }
+    if component.lizt:
+        built_component.update({"list": component.lizt.name })
+        built_component["metadata"].update({"fund_builder_list_id": str(component.list_id)})
+    return built_component
 
 def build_page(page: Page = None, page_display_path: str = None) -> dict:
     if not page:
@@ -166,14 +170,18 @@ def build_navigation(partial_form_json: dict, input_pages: list[Page]) -> dict:
     return partial_form_json
 
 
-def build_lists(pages: dict) -> dict:
+def build_lists(pages:list[dict], form_name:str) -> list:
     # Takes in the form builder format json and copies in any lists used in those pages
     lists = []
     for page in pages:
         for component in page["components"]:
-            if "list" in component:
-                list = copy.deepcopy(get_list_by_id(component["list"]))
-                list.update({"name": component["list"], "title": component["title"]})
+            if component.get("list"):
+                list_from_db = get_list_by_id(component["metadata"]["fund_builder_list_id"])
+                list = {
+                    "type": list_from_db.type,
+                    "items": list_from_db.items,
+                    "name": list_from_db.name
+                }
                 lists.append(list)
 
     return lists
@@ -225,7 +233,7 @@ def build_form_json(form: Form) -> dict:
 
     results = build_navigation(results, form.pages)
 
-    results["lists"] = build_lists(results["pages"])
+    results["lists"] = build_lists(results["pages"], form_name=form.runner_publish_name)
 
     results["pages"].append(SUMMARY_PAGE)
 

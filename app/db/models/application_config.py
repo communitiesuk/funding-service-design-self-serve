@@ -1,3 +1,6 @@
+
+#from __future__ import annotations
+
 import uuid
 from dataclasses import dataclass
 from enum import Enum
@@ -12,7 +15,7 @@ from sqlalchemy.dialects.postgresql import ENUM
 from sqlalchemy.dialects.postgresql import JSON
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import relationship, mapped_column
 from sqlalchemy.types import Boolean
 
 from app.db import db
@@ -27,6 +30,7 @@ class ComponentType(Enum):
     UK_ADDRESS_FIELD = "UkAddressField"
     HTML = "Html"
     YES_NO_FIELD = "YesNoField"
+    RADIOS_FIELD = "RadiosField"
 
 
 @dataclass
@@ -109,6 +113,16 @@ class Page(BaseModel):
         return f"Page(/{self.display_path} - {self.name_in_apply['en']}, Components: {self.components})"
 
 
+class Lizt(BaseModel):
+    list_id = Column(
+        UUID(as_uuid=True),
+        primary_key=True,
+        default=uuid.uuid4,
+    )
+    name = Column(String())
+    type = Column(String())
+    items = Column(JSON())
+
 @dataclass
 class Component(BaseModel):
 
@@ -142,6 +156,12 @@ class Component(BaseModel):
     conditions = Column(JSON(none_as_null=True))
     source_template_id = Column(UUID(as_uuid=True), nullable=True)
     runner_component_name = Column(String(), nullable=False ) #TODO add validation to make sure it's only letters, numbers and _
+    list_id = Column(
+        UUID(as_uuid=True),
+        ForeignKey("list.list_id"),
+        nullable=True, )
+    list_id: Mapped[int | None] = mapped_column(ForeignKey("lizt.list_id"))
+    lizt: Mapped[Lizt | None] = relationship() #back_populates="used_by")
 
     def __repr__(self):
         return f"Component({self.title}, {self.type.value})"

@@ -9,7 +9,7 @@ from app.db.models import Fund
 from app.db.models import Page
 from app.db.models import Round
 from app.db.models import Section
-from app.db.models import Subcriteria
+from app.db.models import Subcriteria, Lizt
 from app.db.models import Theme
 
 
@@ -92,13 +92,20 @@ def init_data():
         name_in_apply={"en": "Lead Contact Details"},
         form_index=1,
     )
+    p5: Page = Page(
+        page_id=uuid4(),
+        display_path="organisation-classification",
+        form_id=f1.form_id,
+        name_in_apply={"en": "Organisation Classification"},
+        form_index=4,
+    )
     p4: Page = Page(
         page_id=uuid4(),
         form_id=None,
         display_path="organisation-alternative-names",
         name_in_apply={"en": "Alternative names of your organisation"},
         form_index=2,
-        is_template=True
+        is_template=True,
     )
     template_page: Page = Page(
         page_id=uuid4(),
@@ -133,7 +140,7 @@ def init_data():
         theme_id=t2.theme_id,
         theme_index=1,
         options={"hideTitle": False, "classes": ""},
-        runner_component_name="main_contact_name"
+        runner_component_name="main_contact_name",
     )
     c5: Component = Component(
         component_id=uuid4(),
@@ -144,7 +151,7 @@ def init_data():
         theme_id=t2.theme_id,
         theme_index=4,
         options={"hideTitle": False, "classes": ""},
-        runner_component_name="main_contact_email"
+        runner_component_name="main_contact_email",
     )
     c6: Component = Component(
         component_id=uuid4(),
@@ -155,7 +162,7 @@ def init_data():
         theme_id=t2.theme_id,
         theme_index=3,
         options={"hideTitle": False, "classes": ""},
-        runner_component_name="main_contact_address"
+        runner_component_name="main_contact_address",
     )
     c1: Component = Component(
         component_id=uuid4(),
@@ -167,7 +174,7 @@ def init_data():
         theme_id=t1.theme_id,
         theme_index=1,
         options={"hideTitle": False, "classes": ""},
-        runner_component_name="organisation_name"
+        runner_component_name="organisation_name",
     )
     c3: Component = Component(
         component_id=uuid4(),
@@ -204,7 +211,7 @@ def init_data():
         theme_id=t1.theme_id,
         theme_index=5,
         options={"hideTitle": False, "classes": ""},
-        runner_component_name="organisation_address"
+        runner_component_name="organisation_address",
     )
     c7: Component = Component(
         component_id=uuid4(),
@@ -215,15 +222,34 @@ def init_data():
         theme_id=t1.theme_id,
         theme_index=2,
         options={"hideTitle": False, "classes": ""},
-        runner_component_name="alt_name_1"
+        runner_component_name="alt_name_1",
+    )
+    l1: Lizt = Lizt(
+        list_id=uuid4(),
+        name="classifications_list",
+        type="string",
+        items=[{"text": "Charity", "value": "charity"}, {"text": "Public Limited Company", "value": "plc"}],
+    )
+    c8: Component = Component(
+        component_id=uuid4(),
+        page_id=p5.page_id,
+        title="How is your organisation classified?",
+        type=ComponentType.RADIOS_FIELD,
+        page_index=1,
+        theme_id=t1.theme_id,
+        theme_index=6,
+        options={"hideTitle": False, "classes": ""},
+        runner_component_name="organisation_classification",
+        list_id=l1.list_id,
     )
     return {
+        "lists": [l1],
         "funds": [f],
         "rounds": [r, r2],
         "sections": [s1],
         "forms": [f1, f2],
-        "pages": [p1, p2, p3, template_page, non_template_page, p4],
-        "components": [c1, c2, c3, c4, c5, c6, c7],
+        "pages": [p1, p2, p3, template_page, non_template_page, p4, p5],
+        "components": [c1, c2, c3, c4, c5, c6, c7, c8],
         "criteria": [cri1],
         "subcriteria": [sc1],
         "themes": [t1, t2],
@@ -247,6 +273,8 @@ def insert_test_data(db):
     db.session.bulk_save_objects(test_data["subcriteria"])
     db.session.commit()
     db.session.bulk_save_objects(test_data["themes"])
+    db.session.commit()
+    db.session.bulk_save_objects(test_data["lists"])
     db.session.commit()
     db.session.bulk_save_objects(test_data["components"])
     db.session.commit()

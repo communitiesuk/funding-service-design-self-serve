@@ -6,10 +6,11 @@ from app.db.models import Criteria
 from app.db.models import Form
 from app.db.models import Page
 from app.db.models import Subcriteria
-from app.db.models import Theme
+from app.db.models import Theme, Lizt
 
 form_1_id = uuid4()
 page_1_id = uuid4()
+page_2_id = uuid4()
 section_1_id = uuid4()
 theme_1_id = uuid4()
 crit_1_id = uuid4()
@@ -22,6 +23,7 @@ mock_c_1 = Component(
     page_id=page_1_id,
     page_index=1,
     theme_id=theme_1_id,
+    runner_component_name="organisation_name",
 )
 mock_c_2 = Component(
     component_id=uuid4(),
@@ -31,6 +33,7 @@ mock_c_2 = Component(
     page_id=page_1_id,
     page_index=2,
     theme_id=theme_1_id,
+    runner_component_name="email-address",
 )
 mock_p_1 = Page(
     page_id=page_1_id,
@@ -57,3 +60,29 @@ sc1: Subcriteria = Subcriteria(
     subcriteria_id=sc_1_id, criteria_index=1, criteria_id=crit_1_id, name="Organisation Information", themes=[t1]
 )
 cri1: Criteria = Criteria(criteria_id=crit_1_id, index=1, name="Unscored", weighting=0.0, subcriteria=[sc1])
+l1: Lizt = Lizt(
+    list_id=uuid4(),
+    name="greetings_list",
+    type="string",
+    items=[{"text": "Hello", "value": "h"}, {"text": "Goodbye", "value": "g"}],
+)
+component_with_list: Component = Component(
+    component_id=uuid4(),
+    page_id=page_2_id,
+    title="How is your organisation classified?",
+    type=ComponentType.RADIOS_FIELD,
+    page_index=1,
+    theme_id=t1.theme_id,
+    theme_index=6,
+    options={"hideTitle": False, "classes": ""},
+    runner_component_name="organisation_classification",
+    list_id=l1.list_id,
+    lizt=l1,
+)
+mock_p_2 = Page(
+    page_id=page_2_id,
+    name_in_apply={"en": "A test page 2"},
+    display_path="test-display-path-2",
+    components=[component_with_list],
+    form_id=None,
+)

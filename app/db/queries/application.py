@@ -1,7 +1,7 @@
 from app.db import db
 from app.db.models import Component
 from app.db.models import Form
-from app.db.models import Page
+from app.db.models import Page, Lizt
 
 
 def get_form_for_component(component: Component) -> Form:
@@ -19,3 +19,11 @@ def get_template_page_by_display_path(display_path: str) -> Page:
 def get_form_by_id(form_id: str) -> Form:
     form = db.session.query(Form).where(Form.form_id == form_id).one_or_none()
     return form
+
+def get_component_by_id(component_id: str) -> Component:
+    component = db.session.query(Component).where(Component.component_id == component_id).one_or_none()
+    return component
+
+def get_list_by_id(list_id: str) -> Lizt:
+    l = db.session.query(Lizt).where(Lizt.list_id == list_id).one_or_none()
+    return l

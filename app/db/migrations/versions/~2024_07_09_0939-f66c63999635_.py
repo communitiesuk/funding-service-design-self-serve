@@ -1,8 +1,8 @@
 """empty message
 
-Revision ID: 3c41bd44561f
+Revision ID: f66c63999635
 Revises: 
-Create Date: 2024-07-08 13:14:12.471404
+Create Date: 2024-07-09 09:39:19.877367
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 from sqlalchemy.dialects import postgresql
 
 # revision identifiers, used by Alembic.
-revision = '3c41bd44561f'
+revision = 'f66c63999635'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -29,6 +29,13 @@ def upgrade():
     sa.Column('audit_info', postgresql.JSON(none_as_null=True, astext_type=sa.Text()), nullable=True),
     sa.PrimaryKeyConstraint('fund_id', name=op.f('pk_fund')),
     sa.UniqueConstraint('short_name', name=op.f('uq_fund_short_name'))
+    )
+    op.create_table('lizt',
+    sa.Column('list_id', sa.UUID(), nullable=False),
+    sa.Column('name', sa.String(), nullable=True),
+    sa.Column('type', sa.String(), nullable=True),
+    sa.Column('items', postgresql.JSON(astext_type=sa.Text()), nullable=True),
+    sa.PrimaryKeyConstraint('list_id', name=op.f('pk_lizt'))
     )
     op.create_table('round',
     sa.Column('round_id', sa.UUID(), nullable=False),
@@ -130,7 +137,7 @@ def upgrade():
     sa.Column('title', sa.String(), nullable=True),
     sa.Column('hint_text', sa.String(), nullable=True),
     sa.Column('options', postgresql.JSON(astext_type=sa.Text()), nullable=True),
-    sa.Column('type', postgresql.ENUM('TEXT_FIELD', 'FREE_TEXT_FIELD', 'EMAIL_ADDRESS_FIELD', 'UK_ADDRESS_FIELD', 'HTML', 'YES_NO_FIELD', name='componenttype'), nullable=True),
+    sa.Column('type', postgresql.ENUM('TEXT_FIELD', 'FREE_TEXT_FIELD', 'EMAIL_ADDRESS_FIELD', 'UK_ADDRESS_FIELD', 'HTML', 'YES_NO_FIELD', 'RADIOS_FIELD', name='componenttype'), nullable=True),
     sa.Column('Template Name', sa.String(), nullable=True),
     sa.Column('is_template', sa.Boolean(), nullable=False),
     sa.Column('audit_info', postgresql.JSON(none_as_null=True, astext_type=sa.Text()), nullable=True),
@@ -139,6 +146,8 @@ def upgrade():
     sa.Column('conditions', postgresql.JSON(none_as_null=True, astext_type=sa.Text()), nullable=True),
     sa.Column('source_template_id', sa.UUID(), nullable=True),
     sa.Column('runner_component_name', sa.String(), nullable=False),
+    sa.Column('list_id', sa.UUID(), nullable=True),
+    sa.ForeignKeyConstraint(['list_id'], ['lizt.list_id'], name=op.f('fk_component_list_id_lizt')),
     sa.ForeignKeyConstraint(['page_id'], ['page.page_id'], name=op.f('fk_component_page_id_page')),
     sa.ForeignKeyConstraint(['theme_id'], ['theme.theme_id'], name=op.f('fk_component_theme_id_theme')),
     sa.PrimaryKeyConstraint('component_id', name=op.f('pk_component'))
@@ -156,5 +165,6 @@ def downgrade():
     op.drop_table('section')
     op.drop_table('criteria')
     op.drop_table('round')
+    op.drop_table('lizt')
     op.drop_table('fund')
     # ### end Alembic commands ###

@@ -19,31 +19,64 @@ LIST1 = {
 
 
 @pytest.mark.parametrize(
-    "pages, available_lists, exp_result",
+    "pages, exp_result",
     [
         (
-            [{"components": [{"title": "First component", "list": "list1"}]}],
-            {"list1": LIST1},
-            [LIST1],
+            [{"components": [{"list": "greetings_list", "metadata": {"fund_builder_list_id": 123}}]}],
+            [
+                {
+                    "name": "greetings_list",
+                    "type": "string",
+                    "items": [{"text": "Hello", "value": "h"}, {"text": "Goodbye", "value": "g"}],
+                }
+            ],
         ),
         (
             [
+                {"components": [{"list": "greetings_list", "metadata": {"fund_builder_list_id": 123}}]},
+                {"components": [{"metadata": {}}]},
+            ],
+            [
                 {
-                    "components": [
-                        {"title": "First component", "list": "list1"},
-                        {"title": "Second component", "list": "list1"},
-                    ]
+                    "name": "greetings_list",
+                    "type": "string",
+                    "items": [{"text": "Hello", "value": "h"}, {"text": "Goodbye", "value": "g"}],
                 }
             ],
-            {"list1": LIST1},
-            [LIST1, LIST1],
+        ),
+        (
+            [
+                {"components": [{"list": "greetings_list", "metadata": {"fund_builder_list_id": 123}}]},
+                {"components": [{"metadata": {}}]},
+                {"components": [{"list": "greetings_list", "metadata": {"fund_builder_list_id": 123}}]},
+            ],
+            [
+                {
+                    "name": "greetings_list",
+                    "type": "string",
+                    "items": [{"text": "Hello", "value": "h"}, {"text": "Goodbye", "value": "g"}],
+                },
+                {
+                    "name": "greetings_list",
+                    "type": "string",
+                    "items": [{"text": "Hello", "value": "h"}, {"text": "Goodbye", "value": "g"}],
+                },
+            ],
         ),
     ],
 )
-def test_build_lists(mocker, pages, available_lists, exp_result):
-    mocker.patch("app.data.data_access.LISTS", available_lists)
+def test_build_lists(mocker, pages, exp_result):
+    mocker.patch(
+        "app.question_reuse.generate_form.get_list_by_id",
+        return_value=Lizt(
+            name="greetings_list",
+            type="string",
+            items=[{"text": "Hello", "value": "h"}, {"text": "Goodbye", "value": "g"}],
+        ),
+    )
     results = build_lists(pages)
     assert len(results) == len(exp_result)
+    assert results[0]["name"] == "greetings_list"
 
 
 mock_lookups = {
@@ -179,12 +212,13 @@ mock_pages = [
                 "title": "Organisation Name",
                 "components": [
                     {
-                        "name": str(mock_c_1.component_id),
+                        "name": "organisation_name",
                         "options": {},
                         "type": "TextField",
                         "title": "Organisation name",
                         "hint": "This must match your registered legal organisation name",
                         "schema": {},
+                        "metadata": {"fund_builder_id": str(mock_c_1.component_id)},
                     }
                 ],
                 "next": [],
@@ -213,6 +247,7 @@ id2 = uuid4()
                 conditions=[
                     {"name": "test_condition", "operator": "is", "value": "yes"},
                 ],
+                runner_component_name="test_name",
             ),
             [
                 {
@@ -223,7 +258,7 @@ id2 = uuid4()
                         "conditions": [
                             {
                                 "field": {
-                                    "name": str(id),
+                                    "name": "test_name",
                                     "type": "TextField",
                                     "display": "test_title",
                                 },
@@ -248,6 +283,7 @@ id2 = uuid4()
                     {"name": "test_condition", "operator": "is", "value": "yes"},
                     {"name": "test_condition2", "operator": "is", "value": "no"},
                 ],
+                runner_component_name="test_name",
             ),
             [
                 {
@@ -258,7 +294,7 @@ id2 = uuid4()
                         "conditions": [
                             {
                                 "field": {
-                                    "name": str(id2),
+                                    "name": "test_name",
                                     "type": "TextField",
                                     "display": "test_title_2",
                                 },
@@ -280,7 +316,7 @@ id2 = uuid4()
                         "conditions": [
                             {
                                 "field": {
-                                    "name": str(id2),
+                                    "name": "test_name",
                                     "type": "TextField",
                                     "display": "test_title_2",
                                 },
@@ -446,6 +482,7 @@ def test_build_navigation_no_conditions(mocker, input_partial_json, input_pages,
                                     "destination_page_path": "organisation-alternative-names",
                                 },
                             ],
+                            runner_component_name="test_c_1",
                         )
                     ],
                 ),
@@ -525,7 +562,7 @@ def test_build_navigation_no_conditions(mocker, input_partial_json, input_pages,
                         "conditions": [
                             {
                                 "field": {
-                                    "name": str(id2),
+                                    "name": "test_c_1",
                                     "type": "TextField",
                                     "display": "test_title_2",
                                 },
@@ -547,7 +584,7 @@ def test_build_navigation_no_conditions(mocker, input_partial_json, input_pages,
                         "conditions": [
                             {
                                 "field": {
-                                    "name": str(id2),
+                                    "name": "test_c_1",
                                     "type": "TextField",
                                     "display": "test_title_2",
                                 },
@@ -565,8 +602,11 @@ def test_build_navigation_no_conditions(mocker, input_partial_json, input_pages,
         )
     ],
 )
-def test_build_navigation_with_conditions(mocker, input_pages,input_partial_json, exp_next, exp_conditions):
-    mocker.patch("app.question_reuse.generate_form.build_page", return_value={"path":"/organisation-alternative-names", "next":[]})
+def test_build_navigation_with_conditions(mocker, input_pages, input_partial_json, exp_next, exp_conditions):
+    mocker.patch(
+        "app.question_reuse.generate_form.build_page",
+        return_value={"path": "/organisation-alternative-names", "next": []},
+    )
     results = build_navigation(partial_form_json=input_partial_json, input_pages=input_pages)
     for page in results["pages"]:
         exp_next_this_page = exp_next[page["path"]]

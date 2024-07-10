@@ -39,7 +39,17 @@
                             <span class="govuk-body">{{ page.form_index }}. {{ page.name_in_apply["en"] }}</span>
                             <ul class="govuk-list--bullet">
                                 {% for component in page.components %}
-                                    <li class="govuk-body">{{ component.page_index }} - {{ component.title }} ({{ component.type.value }})</li>
+                                    {% set list_details %}
+                                    
+                                        {% if component.lizt != None %}
+                                            [
+                                                {%for item in component.lizt.items %}
+                                                    {{item.text}}, 
+                                                {% endfor %}
+                                            ]
+                                        {% endif %}
+                                    {% endset %}
+                                    <li class="govuk-body">{{ component.page_index }} - {{ component.title }} ({{ component.type.value }}{{list_details}})</li>
                                 {% endfor %}
                             </ul>
                         </div>
