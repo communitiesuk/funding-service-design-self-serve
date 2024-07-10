@@ -6,6 +6,7 @@ from app.db.models import Criteria
 from app.db.models import Form
 from app.db.models import Lizt
 from app.db.models import Page
+from app.db.models import Section
 from app.db.models import Subcriteria
 from app.db.models import Theme
 
@@ -16,6 +17,10 @@ section_1_id = uuid4()
 theme_1_id = uuid4()
 crit_1_id = uuid4()
 sc_1_id = uuid4()
+mock_s_1 = Section(
+    section_id=section_1_id,
+    name_in_apply={"en": "Test Section 1"},
+)
 mock_c_1 = Component(
     component_id=uuid4(),
     type=ComponentType.TEXT_FIELD,
@@ -49,6 +54,7 @@ mock_form_1 = Form(
     section_id=section_1_id,
     name_in_apply={"en": "A test form"},
     runner_publish_name="a-test-form",
+    section_index=1,
 )
 t1: Theme = Theme(
     theme_id=theme_1_id,

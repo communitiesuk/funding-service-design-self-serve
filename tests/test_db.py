@@ -7,9 +7,11 @@ from flask_migrate import upgrade
 from sqlalchemy import text
 
 from app.app import create_app
+from app.db.models import Form
 from app.db.models import Fund
 from app.db.models import Page
 from app.db.models import Round
+from app.db.models import Section
 from app.db.queries.application import get_template_page_by_display_path
 from app.db.queries.fund import add_fund
 from app.db.queries.fund import get_all_funds
@@ -134,3 +136,49 @@ def test_get_template_page_by_display_path(flask_test_client, _db):
     result = get_template_page_by_display_path("testing_templates_path")
     assert result
     assert result.page_id == template_page.page_id
+
+
+def test_form_sorting(flask_test_client, _db):
+    # Create a section with one form, at index 1
+    section: Section = Section(section_id=uuid4(), name_in_apply={"en": "hello section"})
+    form1: Form = Form(form_id=uuid4(), section_id=section.section_id, section_index=1, name_in_apply={"en": "Form 1"})
+    _db.session.bulk_save_objects([section, form1])
+    _db.session.commit()
+
+    result_section = _db.session.query(Section).where(Section.section_id == section.section_id).one_or_none()
+    assert len(result_section.forms) == 1
+
+    # add a form at index 2, confirm ordering
+    form2: Form = Form(form_id=uuid4(), section_id=section.section_id, section_index=2, name_in_apply={"en": "Form 2"})
+    _db.session.add(form2)
+    _db.session.commit()
+
+    result_section = _db.session.query(Section).where(Section.section_id == section.section_id).one_or_none()
+    assert len(result_section.forms) == 2
+    assert result_section.forms[0].form_id == form1.form_id
+    assert result_section.forms[1].form_id == form2.form_id
+
+    # add a form at index 0, confirm ordering
+    form0: Form = Form(form_id=uuid4(), section_id=section.section_id, section_index=0, name_in_apply={"en": "Form 0"})
+    _db.session.add(form0)
+    _db.session.commit()
+
+    result_section = _db.session.query(Section).where(Section.section_id == section.section_id).one_or_none()
+    assert len(result_section.forms) == 3
+    assert result_section.forms[0].form_id == form0.form_id
+    assert result_section.forms[1].form_id == form1.form_id
+    assert result_section.forms[2].form_id == form2.form_id
+
+    # insert a form between 1 and 2, check ordering
+    formX: Form = Form(form_id=uuid4(), section_id=section.section_id, name_in_apply={"en": "Form X"})
+    result_section.forms.insert(2, formX)
+    _db.session.bulk_save_objects([result_section])
+    _db.session.commit()
+
+    result_section = _db.session.query(Section).where(Section.section_id == section.section_id).one_or_none()
+    assert len(result_section.forms) == 4
+    assert result_section.forms[0].form_id == form0.form_id
+    assert result_section.forms[1].form_id == form1.form_id
+    assert result_section.forms[2].form_id == formX.form_id
+    assert result_section.forms[3].form_id == form2.form_id
+    assert result_section.forms[3].section_index == 3

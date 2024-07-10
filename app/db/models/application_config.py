@@ -13,6 +13,7 @@ from sqlalchemy import String
 from sqlalchemy.dialects.postgresql import ENUM
 from sqlalchemy.dialects.postgresql import JSON
 from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy.ext.orderinglist import ordering_list
 from sqlalchemy.orm import Mapped
 from sqlalchemy.orm import mapped_column
 from sqlalchemy.orm import relationship
@@ -52,7 +53,9 @@ class Section(BaseModel):
     template_name = Column("Template Name", String(), nullable=True)
     is_template = Column("is_template", Boolean, default=False, nullable=False)
     audit_info = Column("audit_info", JSON(none_as_null=True))
-    forms: Mapped[List["Form"]] = relationship("Form")
+    forms: Mapped[List["Form"]] = relationship(
+        "Form", order_by="Form.section_index", collection_class=ordering_list("section_index")
+    )
     index = Column(Integer())
     source_template_id = Column(UUID(as_uuid=True), nullable=True)
 
@@ -76,8 +79,10 @@ class Form(BaseModel):
     template_name = Column("Template Name", String(), nullable=True)
     is_template = Column("is_template", Boolean, default=False, nullable=False)
     audit_info = Column("audit_info", JSON(none_as_null=True))
-    section_index = Column("section_index", Integer())
-    pages: Mapped[List["Page"]] = relationship("Page")
+    section_index = Column(Integer())
+    pages: Mapped[List["Page"]] = relationship(
+        "Page", order_by="Page.form_index", collection_class=ordering_list("form_index")
+    )
     runner_publish_name = Column(db.String())
     source_template_id = Column(UUID(as_uuid=True), nullable=True)
 
@@ -106,7 +111,9 @@ class Page(BaseModel):
     audit_info = Column("audit_info", JSON(none_as_null=True))
     form_index = Column(Integer())
     display_path = Column("display_path", String())
-    components: Mapped[List["Component"]] = relationship("Component")
+    components: Mapped[List["Component"]] = relationship(
+        "Component", order_by="Component.page_index", collection_class=ordering_list("page_index")
+    )
     source_template_id = Column(UUID(as_uuid=True), nullable=True)
 
     def __repr__(self):
