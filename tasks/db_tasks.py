@@ -1,4 +1,5 @@
 import sys
+from os import getenv
 
 sys.path.insert(1, ".")
 from invoke import task  # noqa:E402
@@ -20,11 +21,18 @@ def recreate_local_dbs(c):
     from sqlalchemy_utils.functions import database_exists
     from sqlalchemy_utils.functions import drop_database
 
-    with app.app_context():
-        for db_uri in [
+    uris = [
+        getenv(
+            "DATABASE_URL",
             "postgresql://postgres:password@fsd-self-serve-db:5432/fund_builder",  # pragma: allowlist secret
+        ),
+        getenv(
+            "DATABASE_URL_UNIT_TEST",
             "postgresql://postgres:password@fsd-self-serve-db:5432/fund_builder_unit_test",  # pragma: allowlist secret
-        ]:
+        ),
+    ]
+    with app.app_context():
+        for db_uri in uris:
             if database_exists(db_uri):
                 print("Existing database found!\n")
                 drop_database(db_uri)
