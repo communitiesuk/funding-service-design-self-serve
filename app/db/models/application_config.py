@@ -1,5 +1,4 @@
-
-#from __future__ import annotations
+# from __future__ import annotations
 
 import uuid
 from dataclasses import dataclass
@@ -15,7 +14,8 @@ from sqlalchemy.dialects.postgresql import ENUM
 from sqlalchemy.dialects.postgresql import JSON
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped
-from sqlalchemy.orm import relationship, mapped_column
+from sqlalchemy.orm import mapped_column
+from sqlalchemy.orm import relationship
 from sqlalchemy.types import Boolean
 
 from app.db import db
@@ -81,9 +81,9 @@ class Form(BaseModel):
     runner_publish_name = Column(db.String())
     source_template_id = Column(UUID(as_uuid=True), nullable=True)
 
-
     def __repr__(self):
         return f"Form({self.runner_publish_name} - {self.name_in_apply['en']}, Pages: {self.pages})"
+
 
 @dataclass
 class Page(BaseModel):
@@ -123,6 +123,7 @@ class Lizt(BaseModel):
     type = Column(String())
     items = Column(JSON())
 
+
 @dataclass
 class Component(BaseModel):
 
@@ -155,13 +156,16 @@ class Component(BaseModel):
     theme_index = Column(Integer())
     conditions = Column(JSON(none_as_null=True))
     source_template_id = Column(UUID(as_uuid=True), nullable=True)
-    runner_component_name = Column(String(), nullable=False ) #TODO add validation to make sure it's only letters, numbers and _
+    runner_component_name = Column(
+        String(), nullable=False
+    )  # TODO add validation to make sure it's only letters, numbers and _
     list_id = Column(
         UUID(as_uuid=True),
         ForeignKey("list.list_id"),
-        nullable=True, )
+        nullable=True,
+    )
     list_id: Mapped[int | None] = mapped_column(ForeignKey("lizt.list_id"))
-    lizt: Mapped[Lizt | None] = relationship() #back_populates="used_by")
+    lizt: Mapped[Lizt | None] = relationship()  # back_populates="used_by")
 
     def __repr__(self):
         return f"Component({self.title}, {self.type.value})"

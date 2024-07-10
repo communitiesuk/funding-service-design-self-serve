@@ -8,14 +8,14 @@ from sqlalchemy import text
 
 from app.app import create_app
 from app.db.models import Fund
-from app.db.models import Round, Page
+from app.db.models import Page
+from app.db.models import Round
+from app.db.queries.application import get_template_page_by_display_path
 from app.db.queries.fund import add_fund
 from app.db.queries.fund import get_all_funds
 from app.db.queries.fund import get_fund_by_id
 from app.db.queries.round import add_round
 from app.db.queries.round import get_round_by_id
-
-from app.db.queries.application import get_template_page_by_display_path
 
 url_base = "postgresql://postgres:password@fsd-self-serve-db:5432/fund_builder"  # pragma: allowlist secret
 
@@ -111,7 +111,7 @@ def test_get_template_page_by_display_path(flask_test_client, _db):
         text("TRUNCATE TABLE fund, round, section,form, page, component, theme, subcriteria, criteria CASCADE;")
     )
     _db.session.commit()
-    
+
     template_page: Page = Page(
         page_id=uuid4(),
         form_id=None,
@@ -128,7 +128,7 @@ def test_get_template_page_by_display_path(flask_test_client, _db):
         name_in_apply={"en": "Not Template Path"},
         form_index=0,
     )
-   
+
     _db.session.bulk_save_objects([template_page, non_template_page])
     _db.session.commit()
     result = get_template_page_by_display_path("testing_templates_path")

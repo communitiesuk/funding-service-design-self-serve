@@ -4,9 +4,10 @@ from app.db.models import Component
 from app.db.models import ComponentType
 from app.db.models import Criteria
 from app.db.models import Form
+from app.db.models import Lizt
 from app.db.models import Page
 from app.db.models import Subcriteria
-from app.db.models import Theme, Lizt
+from app.db.models import Theme
 
 form_1_id = uuid4()
 page_1_id = uuid4()

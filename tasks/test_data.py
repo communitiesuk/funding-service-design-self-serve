@@ -6,10 +6,11 @@ from app.db.models import ComponentType
 from app.db.models import Criteria
 from app.db.models import Form
 from app.db.models import Fund
+from app.db.models import Lizt
 from app.db.models import Page
 from app.db.models import Round
 from app.db.models import Section
-from app.db.models import Subcriteria, Lizt
+from app.db.models import Subcriteria
 from app.db.models import Theme
 
 

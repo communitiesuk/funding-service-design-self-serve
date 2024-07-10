@@ -40,11 +40,11 @@
                             <ul class="govuk-list--bullet">
                                 {% for component in page.components %}
                                     {% set list_details %}
-                                    
+
                                         {% if component.lizt != None %}
                                             [
                                                 {%for item in component.lizt.items %}
-                                                    {{item.text}}, 
+                                                    {{item.text}},
                                                 {% endfor %}
                                             ]
                                         {% endif %}

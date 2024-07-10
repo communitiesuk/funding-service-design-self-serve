@@ -1,32 +1,30 @@
-from datetime import datetime
-
-from flask import Blueprint
-from flask import flash
-from flask import redirect
-from flask import render_template
-from flask import request, Response
 import json
-from flask import url_for
+import os
+from datetime import datetime
 from random import randint
 
 import requests
+from flask import Blueprint
+from flask import Response
+from flask import flash
+from flask import redirect
+from flask import render_template
+from flask import request
+from flask import url_for
 
+from app.all_questions.metadata_utils import generate_print_data_for_sections
 from app.blueprints.fund_builder.forms.fund import FundForm
 from app.blueprints.fund_builder.forms.round import RoundForm
 from app.db.models.fund import Fund
 from app.db.models.round import Round
+from app.db.queries.application import get_form_by_id
 from app.db.queries.fund import add_fund
 from app.db.queries.fund import get_all_funds
 from app.db.queries.fund import get_fund_by_id
 from app.db.queries.round import add_round
 from app.db.queries.round import get_round_by_id
-
-from app.db.queries.application import get_form_by_id
-
-from app.question_reuse.generate_form import build_form_json
 from app.question_reuse.generate_all_questions import print_html
-from app.all_questions.metadata_utils import generate_print_data_for_sections
-import os
+from app.question_reuse.generate_form import build_form_json
 
 build_fund_bp = Blueprint(
     "build_fund_bp",
@@ -35,10 +33,9 @@ build_fund_bp = Blueprint(
     template_folder="templates",
 )
 # TODO get these from config
-FUND_BUILDER_HOST = "fsd-self-serve:8080" 
+FUND_BUILDER_HOST = "fsd-self-serve:8080"
 FORM_RUNNER_URL = os.getenv("FORM_RUNNER_INTERNAL_HOST", "http://form-runner:3009")
 FORM_RUNNER_URL_REDIRECT = os.getenv("FORM_RUNNER_EXTERNAL_HOST", "http://localhost:3009")
-
 
 
 def all_funds_as_govuk_select_items(all_funds: list) -> list:
@@ -125,9 +122,7 @@ def round():
 def preview_form(form_id):
     form = get_form_by_id(form_id)
     form_json = build_form_json(form)
-    form_json["outputs"][0]["outputConfiguration"][
-        "savePerPageUrl"
-    ] = f"http://{FUND_BUILDER_HOST}/dev/save"
+    form_json["outputs"][0]["outputConfiguration"]["savePerPageUrl"] = f"http://{FUND_BUILDER_HOST}/dev/save"
     try:
         publish_response = requests.post(
             url=f"{FORM_RUNNER_URL}/publish", json={"id": form.runner_publish_name, "configuration": form_json}
@@ -138,18 +133,18 @@ def preview_form(form_id):
         return f"unable to publish form: {str(e)}", 500
     return redirect(f"{FORM_RUNNER_URL_REDIRECT}/{form.runner_publish_name}")
 
+
 @build_fund_bp.route("/download/<form_id>", methods=["GET"])
 def download_form_json(form_id):
     form = get_form_by_id(form_id)
     form_json = build_form_json(form)
-    form_json["outputs"][0]["outputConfiguration"][
-        "savePerPageUrl"
-    ] = f"http://localhost:5000/dev/save"
+    form_json["outputs"][0]["outputConfiguration"]["savePerPageUrl"] = "http://localhost:5000/dev/save"
     return Response(
         response=json.dumps(form_json),
         mimetype="application/json",
         headers={"Content-Disposition": f"attachment;filename=form-{randint(0,999)}.json"},
     )
+
 
 @build_fund_bp.route("/fund/round/<round_id>/all_questions", methods=["GET"])
 def view_all_questions(round_id):
@@ -158,9 +153,9 @@ def view_all_questions(round_id):
     sections_in_round = round.sections
     section_data = []
     for section in sections_in_round:
-        forms=[{"name": form.runner_publish_name, "form_data":build_form_json(form)} for form in section.forms]
+        forms = [{"name": form.runner_publish_name, "form_data": build_form_json(form)} for form in section.forms]
         section_data.append({"section_title": section.name_in_apply["en"], "forms": forms})
-        
+
     print_data = generate_print_data_for_sections(
         section_data,
         lang="en",

@@ -1,12 +1,17 @@
+from uuid import uuid4
+
 import pytest
 from flask_migrate import upgrade
 from sqlalchemy import text
-from uuid import uuid4
+
 from app.app import create_app
-from app.db.models import Form, Lizt, Component, ComponentType
+from app.db.models import Component
+from app.db.models import ComponentType
+from app.db.models import Form
 from app.db.models import Fund
-from app.db.queries.fund import get_all_funds
+from app.db.models import Lizt
 from app.db.queries.application import get_component_by_id
+from app.db.queries.fund import get_all_funds
 from app.question_reuse.generate_assessment_config import build_assessment_config
 from app.question_reuse.generate_form import build_form_json
 from tasks.test_data import insert_test_data
@@ -75,10 +80,14 @@ def test_build_form_json(sort_out_test_data):
     assert address_page
     assert address_page["next"][0]["path"] == "/organisation-classification"
 
-    assert next((p for p in result["pages"] if p["path"] == "/organisation-classification"), None)["next"][0]["path"] == "/summary"
+    assert (
+        next((p for p in result["pages"] if p["path"] == "/organisation-classification"), None)["next"][0]["path"]
+        == "/summary"
+    )
 
     summary = next((p for p in result["pages"] if p["path"] == "/summary"), None)
     assert summary
+
 
 # TODO fix this with copying template stuff
 def test_build_assessment_config(sort_out_test_data):
@@ -93,6 +102,7 @@ def test_build_assessment_config(sort_out_test_data):
     assert len(first_unscored["subcriteria"][0]["themes"]) == 2
     assert len(first_unscored["subcriteria"][0]["themes"][0]["answers"]) == 3
     assert len(first_unscored["subcriteria"][0]["themes"][1]["answers"]) == 3
+
 
 def test_list_relationship(_db, flask_test_client):
 
@@ -122,4 +132,3 @@ def test_list_relationship(_db, flask_test_client):
     assert result.list_id == lizt.list_id
     assert result.lizt
     assert result.lizt.name == "classifications_list"
-
