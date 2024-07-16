@@ -129,6 +129,7 @@ class Lizt(BaseModel):
     name = Column(String())
     type = Column(String())
     items = Column(JSON())
+    is_template = Column(Boolean, default=False, nullable=False)
 
 
 @dataclass
