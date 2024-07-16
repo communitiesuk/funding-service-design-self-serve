@@ -132,6 +132,9 @@ class Page(BaseModel):
 Index("ix_template_page_name", Page.display_path, unique=True, postgresql_where="Page.is_template = true")
 
 
+Index("ix_template_page_name", Page.display_path, unique=True, postgresql_where="Page.is_template = true")
+
+
 class Lizt(BaseModel):
     list_id = Column(
         UUID(as_uuid=True),
