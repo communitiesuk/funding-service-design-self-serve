@@ -8,6 +8,7 @@ from typing import List
 from flask_sqlalchemy.model import DefaultMeta
 from sqlalchemy import Column
 from sqlalchemy import ForeignKey
+from sqlalchemy import Index
 from sqlalchemy import Integer
 from sqlalchemy import String
 from sqlalchemy.dialects.postgresql import ENUM
@@ -118,6 +119,9 @@ class Page(BaseModel):
 
     def __repr__(self):
         return f"Page(/{self.display_path} - {self.name_in_apply['en']}, Components: {self.components})"
+
+
+Index("ix_template_page_name", Page.display_path, unique=True, postgresql_where="Page.is_template = true")
 
 
 class Lizt(BaseModel):
