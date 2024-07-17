@@ -1,5 +1,4 @@
 import json
-import os
 from datetime import datetime
 from random import randint
 
@@ -15,6 +14,7 @@ from flask import url_for
 from app.all_questions.metadata_utils import generate_print_data_for_sections
 from app.blueprints.fund_builder.forms.fund import FundForm
 from app.blueprints.fund_builder.forms.round import RoundForm
+from app.config import Config
 from app.db.models.fund import Fund
 from app.db.models.round import Round
 from app.db.queries.application import get_form_by_id
@@ -33,10 +33,6 @@ build_fund_bp = Blueprint(
     url_prefix="/",
     template_folder="templates",
 )
-# TODO get these from config
-FUND_BUILDER_HOST = "fab:8080"
-FORM_RUNNER_URL = os.getenv("FORM_RUNNER_INTERNAL_HOST", "http://form-runner:3009")
-FORM_RUNNER_URL_REDIRECT = os.getenv("FORM_RUNNER_EXTERNAL_HOST", "http://localhost:3009")
 
 
 def all_funds_as_govuk_select_items(all_funds: list) -> list:
@@ -149,16 +145,18 @@ def preview_form(form_id):
     form_json = build_form_json(form)
 
     # Update the savePerPageUrl to point at the dev route to save responses
-    form_json["outputs"][0]["outputConfiguration"]["savePerPageUrl"] = f"http://{FUND_BUILDER_HOST}/dev/save"
+    form_json["outputs"][0]["outputConfiguration"][
+        "savePerPageUrl"
+    ] = f"http://{Config.FAB_HOST}{Config.FAB_SAVE_PER_PAGE}"
     try:
         publish_response = requests.post(
-            url=f"{FORM_RUNNER_URL}/publish", json={"id": form.runner_publish_name, "configuration": form_json}
+            url=f"{Config.FORM_RUNNER_URL}/publish", json={"id": form.runner_publish_name, "configuration": form_json}
         )
         if not str(publish_response.status_code).startswith("2"):
             return "Error during form publish", 500
     except Exception as e:
         return f"unable to publish form: {str(e)}", 500
-    return redirect(f"{FORM_RUNNER_URL_REDIRECT}/{form.runner_publish_name}")
+    return redirect(f"{Config.FORM_RUNNER_URL_REDIRECT}/{form.runner_publish_name}")
 
 
 @build_fund_bp.route("/download/<form_id>", methods=["GET"])
@@ -169,8 +167,9 @@ def download_form_json(form_id):
     form = get_form_by_id(form_id)
     form_json = build_form_json(form)
 
-    # TODO what should we set this to?
-    form_json["outputs"][0]["outputConfiguration"]["savePerPageUrl"] = "http://localhost:5000/dev/save"
+    form_json["outputs"][0]["outputConfiguration"][
+        "savePerPageUrl"
+    ] = f"http://{Config.FAB_HOST}{Config.FAB_SAVE_PER_PAGE}"
     return Response(
         response=json.dumps(form_json),
         mimetype="application/json",
