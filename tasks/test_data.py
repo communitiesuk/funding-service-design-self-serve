@@ -57,19 +57,19 @@ def init_data() -> dict:
     )
 
     s1: Section = Section(
-        section_id=uuid4(), index=1, round_id=r.round_id, name_in_apply={"en": "Organisation Information"}
+        section_id=uuid4(), index=1, round_id=r.round_id, name_in_apply_json={"en": "Organisation Information"}
     )
     f1: Form = Form(
         form_id=uuid4(),
         section_id=s1.section_id,
-        name_in_apply={"en": "About your organisation"},
+        name_in_apply_json={"en": "About your organisation"},
         section_index=1,
         runner_publish_name="about-your-org",
     )
     f2: Form = Form(
         form_id=uuid4(),
         section_id=s1.section_id,
-        name_in_apply={"en": "Contact Details"},
+        name_in_apply_json={"en": "Contact Details"},
         section_index=2,
         runner_publish_name="contact-details",
     )
@@ -77,35 +77,35 @@ def init_data() -> dict:
         page_id=uuid4(),
         form_id=f1.form_id,
         display_path="organisation-name",
-        name_in_apply={"en": "Organisation Name"},
+        name_in_apply_json={"en": "Organisation Name"},
         form_index=1,
     )
     p2: Page = Page(
         page_id=uuid4(),
         display_path="organisation-address",
         form_id=f1.form_id,
-        name_in_apply={"en": "Organisation Address"},
+        name_in_apply_json={"en": "Organisation Address"},
         form_index=3,
     )
     p3: Page = Page(
         page_id=uuid4(),
         form_id=f2.form_id,
         display_path="lead-contact-details",
-        name_in_apply={"en": "Lead Contact Details"},
+        name_in_apply_json={"en": "Lead Contact Details"},
         form_index=1,
     )
     p5: Page = Page(
         page_id=uuid4(),
         display_path="organisation-classification",
         form_id=f1.form_id,
-        name_in_apply={"en": "Organisation Classification"},
+        name_in_apply_json={"en": "Organisation Classification"},
         form_index=4,
     )
     p4: Page = Page(
         page_id=uuid4(),
         form_id=None,
         display_path="organisation-alternative-names",
-        name_in_apply={"en": "Alternative names of your organisation"},
+        name_in_apply_json={"en": "Alternative names of your organisation"},
         form_index=2,
         is_template=True,
     )
@@ -114,7 +114,7 @@ def init_data() -> dict:
         form_id=None,
         display_path="testing_templates_path",
         is_template=True,
-        name_in_apply={"en": "Template Path"},
+        name_in_apply_json={"en": "Template Path"},
         form_index=0,
     )
     non_template_page: Page = Page(
@@ -122,7 +122,7 @@ def init_data() -> dict:
         form_id=None,
         display_path="testing_templates_path",
         is_template=False,
-        name_in_apply={"en": "Not Template Path"},
+        name_in_apply_json={"en": "Not Template Path"},
         form_index=0,
     )
     cri1: Criteria = Criteria(criteria_id=uuid4(), index=1, round_id=r.round_id, name="Unscored", weighting=0.0)
@@ -231,6 +231,7 @@ def init_data() -> dict:
         name="classifications_list",
         type="string",
         items=[{"text": "Charity", "value": "charity"}, {"text": "Public Limited Company", "value": "plc"}],
+        is_template=True,
     )
     c8: Component = Component(
         component_id=uuid4(),

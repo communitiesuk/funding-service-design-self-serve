@@ -54,11 +54,13 @@ def test_add_round(flask_test_client, _db):
 def test_get_all_funds(flask_test_client, _db):
     results = get_all_funds()
     assert results
+    assert results[0].fund_id
 
 
 def test_get_fund_by_id(flask_test_client, _db):
     any_fund = _db.session.execute(text("select * from fund limit 1;")).one()
     result: Fund = get_fund_by_id(any_fund.fund_id)
+    assert result
     assert result.name_json == any_fund.name_json
 
 
@@ -89,7 +91,7 @@ def test_get_template_page_by_display_path(flask_test_client, _db):
         form_id=None,
         display_path="testing_templates_path",
         is_template=True,
-        name_in_apply={"en": "Template Path"},
+        name_in_apply_json={"en": "Template Path"},
         form_index=0,
     )
     non_template_page: Page = Page(
@@ -97,7 +99,7 @@ def test_get_template_page_by_display_path(flask_test_client, _db):
         form_id=None,
         display_path="testing_templates_path",
         is_template=False,
-        name_in_apply={"en": "Not Template Path"},
+        name_in_apply_json={"en": "Not Template Path"},
         form_index=0,
     )
 
@@ -110,8 +112,10 @@ def test_get_template_page_by_display_path(flask_test_client, _db):
 
 def test_form_sorting(flask_test_client, _db):
     # Create a section with one form, at index 1
-    section: Section = Section(section_id=uuid4(), name_in_apply={"en": "hello section"})
-    form1: Form = Form(form_id=uuid4(), section_id=section.section_id, section_index=1, name_in_apply={"en": "Form 1"})
+    section: Section = Section(section_id=uuid4(), name_in_apply_json={"en": "hello section"})
+    form1: Form = Form(
+        form_id=uuid4(), section_id=section.section_id, section_index=1, name_in_apply_json={"en": "Form 1"}
+    )
     _db.session.bulk_save_objects([section, form1])
     _db.session.commit()
 
@@ -119,7 +123,9 @@ def test_form_sorting(flask_test_client, _db):
     assert len(result_section.forms) == 1
 
     # add a form at index 2, confirm ordering
-    form2: Form = Form(form_id=uuid4(), section_id=section.section_id, section_index=2, name_in_apply={"en": "Form 2"})
+    form2: Form = Form(
+        form_id=uuid4(), section_id=section.section_id, section_index=2, name_in_apply_json={"en": "Form 2"}
+    )
     _db.session.add(form2)
     _db.session.commit()
 
@@ -129,7 +135,9 @@ def test_form_sorting(flask_test_client, _db):
     assert result_section.forms[1].form_id == form2.form_id
 
     # add a form at index 0, confirm ordering
-    form0: Form = Form(form_id=uuid4(), section_id=section.section_id, section_index=0, name_in_apply={"en": "Form 0"})
+    form0: Form = Form(
+        form_id=uuid4(), section_id=section.section_id, section_index=0, name_in_apply_json={"en": "Form 0"}
+    )
     _db.session.add(form0)
     _db.session.commit()
 
@@ -140,7 +148,7 @@ def test_form_sorting(flask_test_client, _db):
     assert result_section.forms[2].form_id == form2.form_id
 
     # insert a form between 1 and 2, check ordering
-    formX: Form = Form(form_id=uuid4(), section_id=section.section_id, name_in_apply={"en": "Form X"})
+    formX: Form = Form(form_id=uuid4(), section_id=section.section_id, name_in_apply_json={"en": "Form X"})
     result_section.forms.insert(2, formX)
     _db.session.bulk_save_objects([result_section])
     _db.session.commit()
