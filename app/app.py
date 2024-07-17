@@ -20,7 +20,7 @@ def create_app() -> Flask:
     flask_app.register_blueprint(dev_bp)
     flask_app.register_blueprint(build_fund_bp)
 
-    flask_app.config.from_object("app.config.Config")
+    flask_app.config.from_object("config.Config")
 
     flask_app.static_folder = "app/static/dist"
 

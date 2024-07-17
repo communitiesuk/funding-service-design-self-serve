@@ -6,17 +6,17 @@ print(FLASK_ENV)
 
 match FLASK_ENV:
     case "tasks" | "development":
-        from app.config.envs.development import DevelopmentConfig as Config
+        from config.envs.development import DevelopmentConfig as Config
     # case "dev":
     #     from config.envs.dev import DevConfig as Config
     # case "test":
     #     from config.envs.test import TestConfig as Config
     case "unit_test":
-        from app.config.envs.unit_test import UnitTestConfig as Config
+        from config.envs.unit_test import UnitTestConfig as Config
     # case "uat" | "production":
     #     from config.envs.production import ProductionConfig as Config
     case _:
-        from app.config.envs.default import DefaultConfig as Config
+        from config.envs.default import DefaultConfig as Config
 
 try:
     Config.pretty_print()

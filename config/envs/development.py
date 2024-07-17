@@ -3,7 +3,7 @@ from os import getenv
 
 from fsd_utils import configclass
 
-from app.config.envs.default import DefaultConfig as Config
+from config.envs.default import DefaultConfig as Config
 
 
 @configclass
