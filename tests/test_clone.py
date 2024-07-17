@@ -1,20 +1,118 @@
 from uuid import uuid4
 
+import pytest
+
 from app.db.models import Component
 from app.db.models import ComponentType
 from app.db.models import Page
 from app.db.queries.application import _initiate_cloned_component
+from app.db.queries.application import _initiate_cloned_page
 from app.db.queries.application import clone_multiple_components
 from app.db.queries.application import clone_single_component
+from app.db.queries.application import clone_single_page
 
 
-def test_initiate_cloned_component(mocker):
-    mocker.patch("app.db.queries.application.uuid4", return_value="123-456-789")
+@pytest.fixture
+def mock_new_uuid(mocker):
+    new_id = uuid4()
+    mocker.patch("app.db.queries.application.uuid4", return_value=new_id)
+    yield new_id
+
+
+@pytest.fixture
+def page_with_components(flask_test_client, _db):
+
+    page: Page = Page(
+        page_id=uuid4(),
+        form_id=None,
+        display_path="testing-clones-1",
+        is_template=True,
+        name_in_apply_json={"en": "Clone testing"},
+        form_index=0,
+    )
+
+    template_component_1: Component = Component(
+        component_id=uuid4(),
+        page_id=page.page_id,
+        title="Template qustion 1?",
+        type=ComponentType.YES_NO_FIELD,
+        page_index=1,
+        theme_id=None,
+        theme_index=2,
+        options={"hideTitle": False, "classes": "test-class"},
+        runner_component_name="template_question_name_1",
+        is_template=True,
+    )
+
+    template_component_2: Component = Component(
+        component_id=uuid4(),
+        page_id=page.page_id,
+        title="Template qustion 2?",
+        type=ComponentType.YES_NO_FIELD,
+        page_index=1,
+        theme_id=None,
+        theme_index=2,
+        options={"hideTitle": False, "classes": "test-class"},
+        runner_component_name="template_question_name_2",
+        is_template=True,
+    )
+
+    template_component_3: Component = Component(
+        component_id=uuid4(),
+        page_id=page.page_id,
+        title="Template qustion 3?",
+        type=ComponentType.YES_NO_FIELD,
+        page_index=1,
+        theme_id=None,
+        theme_index=2,
+        options={"hideTitle": False, "classes": "test-class"},
+        runner_component_name="template_question_name_3",
+        is_template=True,
+    )
+
+    _db.session.bulk_save_objects([page, template_component_1, template_component_2, template_component_3])
+    _db.session.commit()
+    yield page
+
+
+# =====================================================================================================================
+# These functions mock the _initiate_cloned_XXX functions and don't use the db
+# =====================================================================================================================
+
+
+def test_initiate_cloned_page(mock_new_uuid):
+    clone: Page = Page(
+        page_id="old-id",
+        name_in_apply_json={"en": "test page 1"},
+        form_id="old-form-id",
+        is_template=True,
+        template_name="Template Page",
+        display_path="template-page",
+    )
+    result: Page = _initiate_cloned_page(to_clone=clone, new_form_id="new-form")
+    assert result
+    assert result.page_id == mock_new_uuid
+
+    # Check other bits are the same
+    assert result.name_in_apply_json == clone.name_in_apply_json
+    assert result.display_path == clone.display_path
+
+    # check template settings
+    assert result.is_template is False
+    assert result.source_template_id == "old-id"
+    assert result.template_name is None
+
+    assert result.form_id == "new-form"
+
+
+def test_initiate_cloned_component(mock_new_uuid):
     clone: Component = Component(
         component_id="old-id",
         page_id="pre-clone",
         title="Template qustion 1?",
         type=ComponentType.TEXT_FIELD,
+        template_name="Template Component",
+        is_template=True,
         page_index=1,
         theme_id="pre-clone",
         theme_index=2,
@@ -22,12 +120,12 @@ def test_initiate_cloned_component(mocker):
         runner_component_name="template_question_name",
         conditions={"a": "b"},
     )
-    result = _initiate_cloned_component(clone, "old-id", "page-123", "theme-234")
+    result = _initiate_cloned_component(clone, "page-123", "theme-234")
 
     assert result
 
     # Check new ID
-    assert result.component_id == "123-456-789"
+    assert result.component_id == mock_new_uuid
 
     # Check other bits are the same
     assert result.title == clone.title
@@ -38,9 +136,15 @@ def test_initiate_cloned_component(mocker):
     # check template settings
     assert result.is_template is False
     assert result.source_template_id == "old-id"
+    assert result.template_name is None
 
     assert result.page_id == "page-123"
     assert result.theme_id == "theme-234"
+
+
+# =====================================================================================================================
+# These functions mock the clone_XXX functions and DO use the db
+# =====================================================================================================================
 
 
 def test_clone_single_component(flask_test_client, _db):
@@ -56,11 +160,19 @@ def test_clone_single_component(flask_test_client, _db):
         runner_component_name="template_question_name",
     )
 
+    old_id = template_component.component_id
+
     _db.session.bulk_save_objects([template_component])
     _db.session.commit()
 
+    assert _db.session.get(Component, old_id)
+
     result = clone_single_component(template_component.component_id)
     assert result
+    new_id = result.component_id
+
+    # check can retrieve new component
+    assert _db.session.get(Component, new_id)
 
     # Check new ID
     assert result.component_id != template_component.component_id
@@ -75,68 +187,17 @@ def test_clone_single_component(flask_test_client, _db):
     assert result.is_template is False
     assert result.source_template_id == template_component.component_id
 
-    # Check new component exists in db
-    from_db = _db.session.query(Component).where(Component.component_id == result.component_id).one_or_none()
-    assert from_db
+    # check can retrieve old component
+    assert _db.session.get(Component, old_id)
 
 
-def test_clone_multiple_components(flask_test_client, _db):
-
-    page: Page = Page(
-        page_id=uuid4(),
-        form_id=None,
-        display_path="testing_clones",
-        is_template=False,
-        name_in_apply={"en": "Clone testing"},
-        form_index=0,
-    )
-
-    template_component_1: Component = Component(
-        component_id=uuid4(),
-        page_id=None,
-        title="Template qustion 1?",
-        type=ComponentType.YES_NO_FIELD,
-        page_index=1,
-        theme_id=None,
-        theme_index=2,
-        options={"hideTitle": False, "classes": "test-class"},
-        runner_component_name="template_question_name_1",
-    )
-
-    template_component_2: Component = Component(
-        component_id=uuid4(),
-        page_id=None,
-        title="Template qustion 2?",
-        type=ComponentType.YES_NO_FIELD,
-        page_index=1,
-        theme_id=None,
-        theme_index=2,
-        options={"hideTitle": False, "classes": "test-class"},
-        runner_component_name="template_question_name_2",
-    )
-
-    template_component_3: Component = Component(
-        component_id=uuid4(),
-        page_id=None,
-        title="Template qustion 3?",
-        type=ComponentType.YES_NO_FIELD,
-        page_index=1,
-        theme_id=None,
-        theme_index=2,
-        options={"hideTitle": False, "classes": "test-class"},
-        runner_component_name="template_question_name_3",
-    )
-
-    _db.session.bulk_save_objects([template_component_1, template_component_2, template_component_3, page])
-    _db.session.commit()
+def test_clone_multiple_components(flask_test_client, _db, page_with_components):
+    existing_page = _db.session.get(Page, page_with_components.page_id)
+    assert existing_page
 
     results = clone_multiple_components(
-        component_ids=[
-            template_component_1.component_id,
-            template_component_2.component_id,
-            template_component_3.component_id,
-        ],
-        new_page_id=page.page_id,
+        component_ids=[c.component_id for c in existing_page.components],
+        new_page_id=None,
         new_theme_id=None,
     )
     assert results
@@ -147,7 +208,75 @@ def test_clone_multiple_components(flask_test_client, _db):
     assert from_db
     assert len(from_db) == 3
 
-    # Check they appear when the parent page now retrieved
-    page_from_db = _db.session.query(Page).where(Page.page_id == page.page_id).one_or_none()
-    assert page_from_db
-    assert len(page_from_db.components) == 3
+    # Check the old ones exist
+    from_db = (
+        _db.session.query(Component)
+        .filter(Component.component_id.in_([c.component_id for c in existing_page.components]))
+        .all()
+    )
+    assert from_db
+    assert len(from_db) == 3
+
+
+def test_clone_page_no_components(flask_test_client, _db, mocker):
+
+    page: Page = Page(
+        page_id=uuid4(),
+        form_id=None,
+        display_path="testing-clones-1",
+        is_template=True,
+        name_in_apply_json={"en": "Clone testing"},
+        form_index=0,
+    )
+
+    old_id = page.page_id
+
+    _db.session.bulk_save_objects([page])
+    _db.session.commit()
+
+    # check initial page exists
+    initial_page_from_db = _db.session.query(Page).where(Page.page_id == old_id).one_or_none()
+    assert initial_page_from_db
+
+    result = clone_single_page(page_id=page.page_id, new_form_id=None)
+    assert result
+    new_id = result.page_id
+
+    # check new page exists
+    new_page_from_db = _db.session.query(Page).where(Page.page_id == new_id).one_or_none()
+    assert new_page_from_db
+
+    # check old page still exists
+    old_page_from_db = _db.session.query(Page).where(Page.page_id == old_id).one_or_none()
+    assert old_page_from_db
+
+
+def test_clone_page_with_components(flask_test_client, _db, mocker, page_with_components):
+
+    old_id = page_with_components.page_id
+    existing_page = _db.session.get(Page, old_id)
+    old_component_ids = [str(c.component_id) for c in existing_page.components]
+
+    # check initial page exists
+    initial_page_from_db = _db.session.query(Page).where(Page.page_id == old_id).one_or_none()
+    assert initial_page_from_db
+
+    result = clone_single_page(page_id=old_id, new_form_id=None)
+    assert result
+    new_id = result.page_id
+
+    # check new page exists
+    new_page_from_db = _db.session.query(Page).where(Page.page_id == new_id).one_or_none()
+    assert new_page_from_db
+    # check components have also been cloned
+    assert len(new_page_from_db.components) == 3
+    for component in new_page_from_db.components:
+        assert str(component.component_id) not in old_component_ids
+
+    # check old page still exists
+    old_page_from_db = _db.session.query(Page).where(Page.page_id == old_id).one_or_none()
+    assert old_page_from_db
+    # check old page still has references to original components
+    assert len(old_page_from_db.components) == 3
+    for component in old_page_from_db.components:
+        assert str(component.component_id) in old_component_ids
