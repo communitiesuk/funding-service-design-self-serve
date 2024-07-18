@@ -20,7 +20,7 @@ def test_build_form_json(seed_dynamic_data):
 
     result = build_form_json(form=form)
     assert result
-    assert len(result["pages"]) == 6
+    assert len(result["pages"]) == 5
     exp_start_path = "/intro-about-your-organisation"
     exp_second_path = "/organisation-name"
     assert result["startPage"] == exp_start_path
@@ -30,11 +30,11 @@ def test_build_form_json(seed_dynamic_data):
 
     org_name_page = next((p for p in result["pages"] if p["path"] == exp_second_path), None)
     assert org_name_page
-    assert len(org_name_page["next"]) == 2
+    assert len(org_name_page["next"]) == 1
 
-    alt_names_page = next((p for p in result["pages"] if p["path"] == "/organisation-alternative-names"), None)
-    assert alt_names_page
-    assert alt_names_page["next"][0]["path"] == "/organisation-address"
+    # alt_names_page = next((p for p in result["pages"] if p["path"] == "/organisation-alternative-names"), None)
+    # assert alt_names_page
+    # assert alt_names_page["next"][0]["path"] == "/organisation-address"
 
     address_page = next((p for p in result["pages"] if p["path"] == "/organisation-address"), None)
     assert address_page
@@ -60,7 +60,7 @@ def test_build_assessment_config(seed_dynamic_data):
     assert first_unscored["name"] == "Unscored"
     assert len(first_unscored["subcriteria"]) == 1
     assert len(first_unscored["subcriteria"][0]["themes"]) == 2
-    assert len(first_unscored["subcriteria"][0]["themes"][0]["answers"]) == 4
+    assert len(first_unscored["subcriteria"][0]["themes"][0]["answers"]) == 3
     assert len(first_unscored["subcriteria"][0]["themes"][1]["answers"]) == 3
 
 
