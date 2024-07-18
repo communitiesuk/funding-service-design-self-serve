@@ -1,4 +1,4 @@
-# services:
-#   fund-store-db:
-#     ports:
-#       - 5433:5432
+services:
+  fab-db:
+    ports:
+      - 5434:5432
