@@ -101,30 +101,30 @@ def init_data() -> dict:
         name_in_apply_json={"en": "Organisation Classification"},
         form_index=4,
     )
-    p4: Page = Page(
-        page_id=uuid4(),
-        form_id=None,
-        display_path="organisation-alternative-names",
-        name_in_apply_json={"en": "Alternative names of your organisation"},
-        form_index=2,
-        is_template=True,
-    )
-    template_page: Page = Page(
-        page_id=uuid4(),
-        form_id=None,
-        display_path="testing_templates_path",
-        is_template=True,
-        name_in_apply_json={"en": "Template Path"},
-        form_index=0,
-    )
-    non_template_page: Page = Page(
-        page_id=uuid4(),
-        form_id=None,
-        display_path="testing_templates_path",
-        is_template=False,
-        name_in_apply_json={"en": "Not Template Path"},
-        form_index=0,
-    )
+    # p_org_alt_names: Page = Page(
+    #     page_id=uuid4(),
+    #     form_id=None,
+    #     display_path="organisation-alternative-names",
+    #     name_in_apply_json={"en": "Alternative names of your organisation"},
+    #     form_index=2,
+    #     is_template=True,
+    # )
+    # template_page: Page = Page(
+    #     page_id=uuid4(),
+    #     form_id=None,
+    #     display_path="testing_templates_path",
+    #     is_template=True,
+    #     name_in_apply_json={"en": "Template Path"},
+    #     form_index=0,
+    # )
+    # non_template_page: Page = Page(
+    #     page_id=uuid4(),
+    #     form_id=None,
+    #     display_path="testing_templates_path",
+    #     is_template=False,
+    #     name_in_apply_json={"en": "Not Template Path"},
+    #     form_index=0,
+    # )
     cri1: Criteria = Criteria(criteria_id=uuid4(), index=1, round_id=r.round_id, name="Unscored", weighting=0.0)
     sc1: Subcriteria = Subcriteria(
         subcriteria_id=uuid4(), criteria_index=1, criteria_id=cri1.criteria_id, name="Organisation Information"
@@ -178,31 +178,31 @@ def init_data() -> dict:
         options={"hideTitle": False, "classes": ""},
         runner_component_name="organisation_name",
     )
-    c3: Component = Component(
-        component_id=uuid4(),
-        page_id=p1.page_id,
-        title="Does your organisation use any other names?",
-        type=ComponentType.YES_NO_FIELD,
-        page_index=2,
-        theme_id=t1.theme_id,
-        theme_index=2,
-        options={"hideTitle": False, "classes": ""},
-        runner_component_name="does_your_organisation_use_other_names",
-        conditions=[
-            {
-                "name": "organisation_other_names_no",
-                "value": "false",  # this must be lowercaes or the navigation doesn't work
-                "operator": "is",
-                "destination_page_path": "CONTINUE",
-            },
-            {
-                "name": "organisation_other_names_yes",
-                "value": "true",  # this must be lowercaes or the navigation doesn't work
-                "operator": "is",
-                "destination_page_path": "organisation-alternative-names",
-            },
-        ],
-    )
+    # c3: Component = Component(
+    #     component_id=uuid4(),
+    #     page_id=p1.page_id,
+    #     title="Does your organisation use any other names?",
+    #     type=ComponentType.YES_NO_FIELD,
+    #     page_index=2,
+    #     theme_id=t1.theme_id,
+    #     theme_index=2,
+    #     options={"hideTitle": False, "classes": ""},
+    #     runner_component_name="does_your_organisation_use_other_names",
+    #     conditions=[
+    #         {
+    #             "name": "organisation_other_names_no",
+    #             "value": "false",  # this must be lowercaes or the navigation doesn't work
+    #             "operator": "is",
+    #             "destination_page_path": "CONTINUE",
+    #         },
+    #         {
+    #             "name": "organisation_other_names_yes",
+    #             "value": "true",  # this must be lowercaes or the navigation doesn't work
+    #             "operator": "is",
+    #             "destination_page_path": "organisation-alternative-names",
+    #         },
+    #     ],
+    # )
     c2: Component = Component(
         component_id=uuid4(),
         page_id=p2.page_id,
@@ -215,17 +215,17 @@ def init_data() -> dict:
         options={"hideTitle": False, "classes": ""},
         runner_component_name="organisation_address",
     )
-    c7: Component = Component(
-        component_id=uuid4(),
-        page_id=p4.page_id,
-        title="Alternative Name 1",
-        type=ComponentType.TEXT_FIELD,
-        page_index=1,
-        theme_id=None,
-        theme_index=None,
-        options={"hideTitle": False, "classes": ""},
-        runner_component_name="alt_name_1",
-    )
+    # c7: Component = Component(
+    #     component_id=uuid4(),
+    #     page_id=p_org_alt_names.page_id,
+    #     title="Alternative Name 1",
+    #     type=ComponentType.TEXT_FIELD,
+    #     page_index=1,
+    #     theme_id=None,
+    #     theme_index=None,
+    #     options={"hideTitle": False, "classes": ""},
+    #     runner_component_name="alt_name_1",
+    # )
     l1: Lizt = Lizt(
         list_id=uuid4(),
         name="classifications_list",
@@ -251,8 +251,8 @@ def init_data() -> dict:
         "rounds": [r, r2],
         "sections": [s1],
         "forms": [f1, f2],
-        "pages": [p1, p2, p3, template_page, non_template_page, p4, p5],
-        "components": [c1, c2, c3, c4, c5, c6, c7, c8],
+        "pages": [p1, p2, p3, p5],  # template_page, non_template_page, p_org_alt_names
+        "components": [c1, c2, c4, c5, c6, c8],  # c3,c7
         "criteria": [cri1],
         "subcriteria": [sc1],
         "themes": [t1, t2],
