@@ -14,6 +14,24 @@ from app.db.models import Section
 from app.db.models import Subcriteria
 from app.db.models import Theme
 
+BASIC_FUND_INFO = {
+    "name_json": {"en": "Unit Test Fund"},
+    "title_json": {"en": "funding to improve testing"},
+    "description_json": {"en": "A £10m fund to improve testing across the devolved nations."},
+    "welsh_available": False,
+}
+BASIC_ROUND_INFO = {
+    "audit_info": {"user": "dummy_user", "timestamp": datetime.now().isoformat(), "action": "create"},
+    "title_json": {"en": "round the first"},
+    "opens": datetime.now(),
+    "deadline": datetime.now(),
+    "assessment_start": datetime.now(),
+    "reminder_date": datetime.now(),
+    "assessment_deadline": datetime.now(),
+    "prospectus_link": "http://www.google.com",
+    "privacy_notice_link": "http://www.google.com",
+}
+
 
 def init_salmon_fishing_fund():
 
