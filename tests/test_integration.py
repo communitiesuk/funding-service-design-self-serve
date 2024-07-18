@@ -8,19 +8,19 @@ from app.db.models import Form
 from app.db.models import Fund
 from app.db.models import Lizt
 from app.db.queries.application import get_component_by_id
-from app.db.queries.fund import get_all_funds
+from app.db.queries.fund import get_fund_by_id
 from app.question_reuse.generate_assessment_config import build_assessment_config
 from app.question_reuse.generate_form import build_form_json
 
 
-def test_build_form_json(seed_dynamic_data):
+def test_build_form_json_no_conditions(seed_dynamic_data):
 
-    f: Fund = get_all_funds()[0]
+    f: Fund = get_fund_by_id(seed_dynamic_data["funds"][0].fund_id)
     form: Form = f.rounds[0].sections[0].forms[0]
 
     result = build_form_json(form=form)
     assert result
-    assert len(result["pages"]) == 5
+    assert len(result["pages"]) == 3
     exp_start_path = "/intro-about-your-organisation"
     exp_second_path = "/organisation-name"
     assert result["startPage"] == exp_start_path
@@ -36,14 +36,17 @@ def test_build_form_json(seed_dynamic_data):
     # assert alt_names_page
     # assert alt_names_page["next"][0]["path"] == "/organisation-address"
 
-    address_page = next((p for p in result["pages"] if p["path"] == "/organisation-address"), None)
-    assert address_page
-    assert address_page["next"][0]["path"] == "/organisation-classification"
+    # address_page = next((p for p in result["pages"] if p["path"] == "/organisation-address"), None)
+    # assert address_page
+    # assert address_page["next"][0]["path"] == "/organisation-classification"
 
-    assert (
-        next((p for p in result["pages"] if p["path"] == "/organisation-classification"), None)["next"][0]["path"]
-        == "/summary"
-    )
+    # assert (
+    #     next((p for p in result["pages"] if p["path"] == "/organisation-classification"), None)["next"][0]["path"]
+    #     == "/summary"
+    # )
+    assert len(org_name_page["next"]) == 1
+    assert org_name_page["next"][0]["path"] == "/summary"
+    assert len(org_name_page["components"]) == 2
 
     summary = next((p for p in result["pages"] if p["path"] == "/summary"), None)
     assert summary
@@ -51,7 +54,8 @@ def test_build_form_json(seed_dynamic_data):
 
 # TODO this fails with components from a template (branching logic)
 def test_build_assessment_config(seed_dynamic_data):
-    f: Fund = get_all_funds()[0]
+
+    f: Fund = get_fund_by_id(seed_dynamic_data["funds"][0].fund_id)
     criteria = f.rounds[0].criteria[0]
     result = build_assessment_config(criteria_list=[criteria])
     assert result
@@ -59,9 +63,8 @@ def test_build_assessment_config(seed_dynamic_data):
     assert first_unscored
     assert first_unscored["name"] == "Unscored"
     assert len(first_unscored["subcriteria"]) == 1
-    assert len(first_unscored["subcriteria"][0]["themes"]) == 2
-    assert len(first_unscored["subcriteria"][0]["themes"][0]["answers"]) == 3
-    assert len(first_unscored["subcriteria"][0]["themes"][1]["answers"]) == 3
+    assert len(first_unscored["subcriteria"][0]["themes"]) == 1
+    assert len(first_unscored["subcriteria"][0]["themes"][0]["answers"]) == 2
 
 
 list_id = uuid4()
