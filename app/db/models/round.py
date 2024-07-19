@@ -5,6 +5,7 @@ from flask_sqlalchemy.model import DefaultMeta
 from sqlalchemy import Column
 from sqlalchemy import DateTime
 from sqlalchemy import ForeignKey
+from sqlalchemy import String
 from sqlalchemy import UniqueConstraint
 from sqlalchemy.dialects.postgresql import JSON
 from sqlalchemy.dialects.postgresql import UUID
@@ -46,6 +47,8 @@ class Round(BaseModel):
     privacy_notice_link = Column("privacy_notice", db.String(), nullable=False, unique=False)
     audit_info = Column("audit_info", JSON(none_as_null=True))
     is_template = Column("is_template", Boolean, default=False, nullable=False)
+    source_template_id = Column(UUID(as_uuid=True), nullable=True)
+    template_name = Column(String(), nullable=True)
     sections: Mapped[list["Section"]] = relationship("Section")
     criteria: Mapped[list["Criteria"]] = relationship("Criteria")
     # several other fields to add

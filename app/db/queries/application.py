@@ -6,6 +6,7 @@ from app.db.models import Form
 from app.db.models import Lizt
 from app.db.models import Page
 from app.db.models.application_config import Section
+from app.db.models.round import Round
 
 
 def get_form_for_component(component: Component) -> Form:
@@ -178,3 +179,22 @@ def clone_multiple_components(component_ids: list[str], new_page_id=None, new_th
     db.session.commit()
 
     return clones
+
+
+def clone_single_round(round_id, new_fund_id) -> Round:
+    round_to_clone = db.session.query(Round).where(Round.round_id == round_id).one_or_none()
+    cloned_round = Round(**round_to_clone)
+    cloned_round.round_id = uuid4()
+    cloned_round.fund_id = new_fund_id
+    cloned_round.is_template = False
+    cloned_round.source_template_id = round_to_clone.round_id
+    cloned_round.template_name = None
+    cloned_round.sections = None
+
+    db.session.add(cloned_round)
+    db.session.commit()
+
+    for section in round_to_clone.sections:
+        clone_single_section(section.section_id, cloned_round.round_id)
+
+    return cloned_round
