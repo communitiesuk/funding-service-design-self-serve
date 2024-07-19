@@ -5,6 +5,7 @@ from app.db.models import Component
 from app.db.models import Form
 from app.db.models import Lizt
 from app.db.models import Page
+from app.db.models.application_config import Section
 
 
 def get_form_for_component(component: Component) -> Form:
@@ -70,6 +71,44 @@ def _initiate_cloned_form(to_clone: Form, new_section_id: str) -> Form:
     clone.source_template_id = to_clone.form_id
     clone.template_name = None
     clone.pages = []
+    return clone
+
+
+def _initiate_cloned_section(to_clone: Section, new_round_id: str) -> Form:
+    clone = Section(**to_clone.as_dict())
+    clone.round_id = new_round_id
+    clone.section_id = uuid4()
+    clone.is_template = False
+    clone.source_template_id = to_clone.section_id
+    clone.template_name = None
+    clone.pages = []
+    return clone
+
+
+def clone_single_section(section_id: str, new_round_id=None) -> Section:
+    section_to_clone: Section = db.session.query(Section).where(Section.section_id == section_id).one_or_none()
+    clone = _initiate_cloned_section(section_to_clone, new_round_id)
+
+    cloned_forms = []
+    cloned_pages = []
+    cloned_components = []
+    # loop through forms in this section and clone each one
+    for form_to_clone in section_to_clone.forms:
+        cloned_form = _initiate_cloned_form(form_to_clone, clone.section_id)
+        # loop through pages in this section and clone each one
+        for page_to_clone in form_to_clone.pages:
+            cloned_page = _initiate_cloned_page(page_to_clone, new_form_id=cloned_form.form_id)
+            cloned_pages.append(cloned_page)
+            # clone the components on this page
+            cloned_components.extend(
+                _initiate_cloned_components_for_page(page_to_clone.components, cloned_page.page_id)
+            )
+
+        cloned_forms.append(cloned_form)
+
+    db.session.add_all([clone, *cloned_forms, *cloned_pages, *cloned_components])
+    db.session.commit()
+
     return clone
 
 
