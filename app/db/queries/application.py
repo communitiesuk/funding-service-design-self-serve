@@ -62,18 +62,52 @@ def _initiate_cloned_page(to_clone: Page, new_form_id=None):
     return clone
 
 
+def _initiate_cloned_form(to_clone: Form, new_section_id: str) -> Form:
+    clone = Form(**to_clone.as_dict())
+    clone.form_id = uuid4()
+    clone.section_id = new_section_id
+    clone.is_template = False
+    clone.source_template_id = to_clone.form_id
+    clone.template_name = None
+    clone.pages = []
+    return clone
+
+
+def clone_single_form(form_id: str, new_section_id=None) -> Form:
+    form_to_clone: Form = db.session.query(Form).where(Form.form_id == form_id).one_or_none()
+    clone = _initiate_cloned_form(form_to_clone, new_section_id)
+
+    cloned_pages = []
+    cloned_components = []
+    for page_to_clone in form_to_clone.pages:
+
+        cloned_page = _initiate_cloned_page(page_to_clone, new_form_id=clone.form_id)
+        cloned_pages.append(cloned_page)
+        cloned_components.extend(_initiate_cloned_components_for_page(page_to_clone.components, cloned_page.page_id))
+    db.session.add_all([clone, *cloned_pages, *cloned_components])
+    db.session.commit()
+
+    return clone
+
+
+def _initiate_cloned_components_for_page(
+    components_to_clone: list[Component], new_page_id: str = None, new_theme_id: str = None
+):
+    cloned_components = []
+    for component_to_clone in components_to_clone:
+
+        cloned_component = _initiate_cloned_component(
+            component_to_clone, new_page_id=new_page_id, new_theme_id=None
+        )  # TODO how should themes work when cloning?
+        cloned_components.append(cloned_component)
+    return cloned_components
+
+
 def clone_single_page(page_id: str, new_form_id=None) -> Page:
     page_to_clone: Page = db.session.query(Page).where(Page.page_id == page_id).one_or_none()
     clone = _initiate_cloned_page(page_to_clone, new_form_id)
 
-    cloned_components = []
-    for component_to_clone in page_to_clone.components:
-
-        cloned_component = _initiate_cloned_component(
-            component_to_clone, new_page_id=clone.page_id, new_theme_id=None
-        )  # TODO how should themes work when cloning?
-        cloned_components.append(cloned_component)
-    # clone.components = cloned_components
+    cloned_components = _initiate_cloned_components_for_page(page_to_clone.components, new_page_id=clone.page_id)
     db.session.add_all([clone, *cloned_components])
     db.session.commit()
 
