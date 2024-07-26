@@ -3,6 +3,7 @@ from app.blueprints.self_serve.data.not_a_db import FORMS
 from app.blueprints.self_serve.data.not_a_db import LISTS
 from app.blueprints.self_serve.data.not_a_db import PAGES
 from app.blueprints.self_serve.data.not_a_db import SECTIONS
+from app.db.queries.application import insert_new_section
 
 saved_responses = []
 saved_sections = {}
@@ -65,21 +66,124 @@ def save_page(page: dict):
 def get_list_by_id(id: str) -> dict:
     return LISTS.get(id, None)
 
+# from app.db.queries.application import insert_new_section
+# from app.db.queries.application import insert_new_form
+# from app.db.queries.application import insert_new_page
+# from app.db.queries.application import insert_new_component
 
-def save_question(question: dict):
+def save_template_component(component: dict):
+    """
+    Save a template component to the database
+        Parameters:
+            component: dict    The component to save to the database as a template
+        Returns:
+            dict           The saved component
+    """
+    
+    """ temp in memory solution """
     COMPONENTS.append(
         {
             "json_snippet": {
                 "options": {},
-                "type": question["question_type"],
-                "title": question["title"],
-                "hint": question["hint"],
+                "type": component["question_type"],
+                "title": component["title"],
+                "hint": component["hint"],
             },
-            "id": question["id"],
-            "builder_display_name": question["builder_display_name"],
+            "id": component["id"],
+            "builder_display_name": component["builder_display_name"],
         }
     )
+    """ end temp """
+
+    # component_config = {
+    #     "page_id": component.get("page_id"),
+    #     "theme_id": component.get("theme_id"),
+    #     "title": component.get("title"),
+    #     "hint_text": component.get("hint"),
+    #     "options": component.get("options"),
+    #     "type": component.get("question_type"),
+    #     "template_name": component.get("template_name"),
+    #     "is_template": True,
+    #     "audit_info": component.get("audit_info"),
+    #     "page_index": component.get("page_index"),
+    #     "theme_index": component.get("theme_index"),
+    #     "conditions": component.get("conditions"),
+    #     "runner_component_name": component.get("runner_component_name"),
+    #     "list_id": component.get("list_id"),
+    # }
+
+    # return insert_new_component(component_config)
+
+def save_template_page(page: dict):
+    """
+    Save a template page to the database
+        Parameters:
+            page: dict    The page to save to the database as a template
+        Returns:
+            dict           The saved page
+    """
+
+    PAGES.append(page) # Temp in memory solution
+
+    # page_config = {
+    #     "form_id": page.get("form_id"),
+    #     "name_in_apply_json": {
+    #         "en": page.get("form_display_name"),
+    #     },
+    #     "template_name": page.get("builder_display_name"),
+    #     "is_template": True,
+    #     "audit_info": page.get("audit_info"),
+    #     "form_index": page.get("form_index"),
+    #     "display_path": page.get("display_path"),
+    #     "controller": page.get("controller"),
+    # }
+
+    # return insert_new_page(page_config)
 
 
-def save_section(section: dict):
-    SECTIONS.append(section)
+def save_template_form(form: dict):
+    """
+    Save a template form to the database
+        Parameters:
+            form: dict    The form to save to the database as a template
+        Returns:
+            dict           The saved form
+    """
+    FORMS.append(form) # Temp in memory solution
+
+    # form_config = {
+    #     "name_in_apply_json": {
+    #         "en": form.get("form_title"),
+    #     },
+    #     "is_template": True,
+    #     "template_name": form.get("builder_display_name"),
+    #     "audit_info": form.get("audit_info"),
+    #     "section_id": form.get("section_id"),
+    #     "section_index": form.get("section_index"),
+    #     "runner_publish_name": None # This is a template
+    # }
+
+    # insert_new_form(form_config)
+
+def save_template_section(section: dict):
+    """
+    Save a template section to the database
+        Parameters:
+          section: dict    The section to save to the database as a template
+        Returns:
+            dict           The saved section
+    """
+    SECTIONS.append(section) # Temp in memory solution
+
+    # section_config = {
+    #     "name_in_apply_json": {
+    #         "en": section.get("section_display_name"),
+    #     },
+    #     "is_template": True,  # Assuming this remains a constant value
+    #     "template_name": section.get("builder_display_name"),
+    #     "description": section.get("description"),
+    #     "audit_info": section.get("audit_info"),
+    # }
+
+    # return insert_new_section(section_config)
+
