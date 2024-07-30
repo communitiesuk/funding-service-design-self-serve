@@ -234,29 +234,20 @@ def insert_new_section(new_section_config):
     db.session.commit()
     return section
 
+
 def update_section(section_id, new_section_config):
-   # Fetch the section by section_id, or return None if not found
     section = db.session.query(Section).where(Section.section_id == section_id).one_or_none()
-    
-    # If the section exists, update its properties based on new_section_config
     if section:
-        if "round_id" in new_section_config:
-            section.round_id = new_section_config["round_id"]
-        if "name_in_apply_json" in new_section_config:
-            section.name_in_apply_json = new_section_config["name_in_apply_json"]
-        if "template_name" in new_section_config:
-            section.template_name = new_section_config["template_name"]
-        if "is_template" in new_section_config:
-            section.is_template = new_section_config["is_template"]
-        if "audit_info" in new_section_config:
-            section.audit_info = new_section_config["audit_info"]
-        if "index" in new_section_config:
-            section.index = new_section_config["index"]
+        # Define a list of allowed keys to update
+        allowed_keys = ["round_id", "name_in_apply_json", "template_name", "is_template",
+                        "audit_info", "index"]
         
-        # Commit the changes to the database
+        for key, value in new_section_config.items():
+            # Update the section if the key is allowed
+            if key in allowed_keys:
+                setattr(section, key, value)
+        
         db.session.commit()
-    
-    # Return the updated section
     return section
 
 def delete_section(section_id):
@@ -303,20 +294,16 @@ def insert_new_form(new_form_config):
 def update_form(form_id, new_form_config):
     form = db.session.query(Form).where(Form.form_id == form_id).one_or_none()
     if form:
-        if "section_id" in new_form_config:
-            form.section_id = new_form_config["section_id"]
-        if "name_in_apply_json" in new_form_config:
-            form.name_in_apply_json = new_form_config["name_in_apply_json"]
-        if "template_name" in new_form_config:
-            form.template_name = new_form_config["template_name"]
-        if "is_template" in new_form_config:
-            form.is_template = new_form_config["is_template"]
-        if "audit_info" in new_form_config:
-            form.audit_info = new_form_config["audit_info"]
-        if "section_index" in new_form_config:
-            form.section_index = new_form_config["section_index"]
-        if "runner_publish_name" in new_form_config:
-            form.runner_publish_name = new_form_config["runner_publish_name"]
+        # Define a list of allowed keys to update
+        allowed_keys = ["section_id", "name_in_apply_json", "template_name", "is_template",
+                        "audit_info", "section_index", "runner_publish_name"]
+        
+        # Iterate over the new_form_config dictionary
+        for key, value in new_form_config.items():
+            # Update the form if the key is allowed
+            if key in allowed_keys:
+                setattr(form, key, value)
+        
         db.session.commit()
     return form
 
@@ -365,22 +352,15 @@ def insert_new_page(new_page_config):
 def update_page(page_id, new_page_config):
     page = db.session.query(Page).where(Page.page_id == page_id).one_or_none()
     if page:
-        if "form_id" in new_page_config:
-            page.form_id = new_page_config["form_id"]
-        if "name_in_apply_json" in new_page_config:
-            page.name_in_apply_json = new_page_config["name_in_apply_json"]
-        if "template_name" in new_page_config:
-            page.template_name = new_page_config["template_name"]
-        if "is_template" in new_page_config:
-            page.is_template = new_page_config["is_template"]
-        if "audit_info" in new_page_config:
-            page.audit_info = new_page_config["audit_info"]
-        if "form_index" in new_page_config:
-            page.form_index = new_page_config["form_index"]
-        if "display_path" in new_page_config:
-            page.display_path = new_page_config["display_path"]
-        if "controller" in new_page_config:
-            page.controller = new_page_config["controller"]
+        # Define a list of allowed keys to update
+        allowed_keys = ["form_id", "name_in_apply_json", "template_name", "is_template",
+                        "audit_info", "form_index", "display_path", "controller"]
+
+        for key, value in new_page_config.items():
+            # Update the page if the key is allowed
+            if key in allowed_keys:
+                setattr(page, key, value)
+        
         db.session.commit()
     return page
 
@@ -446,34 +426,16 @@ def insert_new_component(new_component_config: dict):
 def update_component(component_id, new_component_config):
     component = db.session.query(Component).where(Component.component_id == component_id).one_or_none()
     if component:
-        if "page_id" in new_component_config:
-            component.page_id = new_component_config["page_id"]
-        if "theme_id" in new_component_config:
-            component.theme_id = new_component_config["theme_id"]
-        if "title" in new_component_config:
-            component.title = new_component_config["title"]
-        if "hint_text" in new_component_config:
-            component.hint_text = new_component_config["hint_text"]
-        if "options" in new_component_config:
-            component.options = new_component_config["options"]
-        if "type" in new_component_config:
-            component.type = new_component_config["type"]
-        if "template_name" in new_component_config:
-            component.template_name = new_component_config["template_name"]
-        if "is_template" in new_component_config:
-            component.is_template = new_component_config["is_template"]
-        if "audit_info" in new_component_config:
-            component.audit_info = new_component_config["audit_info"]
-        if "page_index" in new_component_config:
-            component.page_index = new_component_config["page_index"]
-        if "theme_index" in new_component_config:
-            component.theme_index = new_component_config["theme_index"]
-        if "conditions" in new_component_config:
-            component.conditions = new_component_config["conditions"]
-        if "runner_component_name" in new_component_config:
-            component.runner_component_name = new_component_config["runner_component_name"]
-        if "list_id" in new_component_config:
-            component.list_id = new_component_config["list_id"]
+        # Define a list of allowed keys to update to prevent updating unintended fields
+        allowed_keys = ["page_id", "theme_id", "title", "hint_text", "options", "type", 
+                        "template_name", "is_template", "audit_info", "page_index", 
+                        "theme_index", "conditions", "runner_component_name", "list_id"]
+        
+        for key, value in new_component_config.items():
+            # Update the component if the key is allowed
+            if key in allowed_keys:
+                setattr(component, key, value)
+        
         db.session.commit()
     return component
 
