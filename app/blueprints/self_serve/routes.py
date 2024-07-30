@@ -118,8 +118,8 @@ def view_section_questions():
 # CRUD routes
 
 # Create routes
-@self_serve_bp.route("section", methods=["GET", "POST"])
-def crud_section():
+@self_serve_bp.route("section", methods=["GET", "POST", "PUT", "DELETE"])
+def section():
     # TODO: Create frontend routes and connect to middleware
     if request.method == "GET":
         pass
@@ -147,8 +147,8 @@ def crud_section():
         # save to db here
     return render_template("create_section.html", available_forms=available_forms, form=form)
 
-@self_serve_bp.route("/form", methods=["GET", "POST"])
-def crud_form():
+@self_serve_bp.route("/form", methods=["GET", "POST", "PUT", "DELETE"])
+def form():
     # TODO: Create frontend routes and connect to middleware
     if request.method == "GET":
         pass
@@ -187,7 +187,7 @@ def crud_form():
     return render_template("create_form.html", available_pages=available_pages, form=form)
 
 @self_serve_bp.route("/page", methods=["GET", "POST", "PUT", "DELETE"])
-def crud_page():
+def page():
     # TODO: Create frontend routes and connect to middleware
     if request.method == "GET":
         pass
@@ -219,8 +219,8 @@ def crud_page():
     ]
     return render_template("create_page.html", form=form, available_questions=available_questions)
 
-@self_serve_bp.route("/question", methods=["GET", "PUT", "POST" "DELETE"])
-def crud_question():
+@self_serve_bp.route("/question", methods=["GET", "PUT", "POST", "DELETE"])
+def question():
     # TODO: Create frontend routes and connect to middleware
     if request.method == "GET":
         pass

@@ -23,19 +23,19 @@
             <ul class="govuk-body">
                 <li class="govuk-body"><a class="govuk-link" href="{{ url_for('self_serve_bp.question')}}">Add a
                         Question</a></li>
-                <li class="govuk-body"><a class="govuk-link" href="{{ url_for('self_serve_bp.question?edit=true')}}">Edit/Delete a
+                <li class="govuk-body"><a class="govuk-link" href="{{ url_for('self_serve_bp.question', template='edit') }}">Edit/Delete a
                     Question</a></li>
                 <li class="govuk-body"><a class="govuk-link" href="{{ url_for('self_serve_bp.page')}}">Create a
                         Page</a></li>
-                <li class="govuk-body"><a class="govuk-link" href="{{ url_for('self_serve_bp.page?edit=true')}}">Edit/Delete a
+                <li class="govuk-body"><a class="govuk-link" href="{{ url_for('self_serve_bp.page', template='edit') }}">Edit/Delete a
                     Page</a></li>
                 <li class="govuk-body"><a class="govuk-link" href="{{ url_for('self_serve_bp.form')}}">Create an
                         Application Form</a></li>
-                <li class="govuk-body"><a class="govuk-link" href="{{ url_for('self_serve_bp.form?edit=true')}}">Edit/Delete an
+                <li class="govuk-body"><a class="govuk-link" href="{{ url_for('self_serve_bp.form', template='edit') }}">Edit/Delete an
                     Application Form</a></li>
                 <li class="govuk-body"><a class="govuk-link" href="{{ url_for('self_serve_bp.section')}}">Create a
                         Section (Group Forms)</a></li>
-                <li class="govuk-body"><a class="govuk-link" href="{{ url_for('self_serve_bp.section?edit=true')}}">Edit/Delete a
+                <li class="govuk-body"><a class="govuk-link" href="{{ url_for('self_serve_bp.section', template='edit') }}">Edit/Delete a
                     Section</a></li>
             </ul>
             <h2 class="govuk-heading-s">Fund Metadata</h2>
