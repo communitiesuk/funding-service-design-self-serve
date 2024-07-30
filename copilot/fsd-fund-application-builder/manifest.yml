@@ -18,7 +18,7 @@ http:
 # Configuration for your containers and service.
 image:
   # Docker build arguments. For additional overrides: https://aws.github.io/copilot-cli/docs/manifest/lb-web-service/#image-location
-  location: ghcr.io/communitiesuk/funding-service-design-fund-application-builder:sha-6cdb8baa686e0357be6b56730938bab7e433fd96
+  location: ghcr.io/communitiesuk/funding-service-design-self-serve:sha-67a9bd8685478b2cc942b795891353b61c3a5763
   # Port exposed through your container to route traffic to it.
   port: 8080
 
