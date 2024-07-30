@@ -118,8 +118,16 @@ def view_section_questions():
 # CRUD routes
 
 # Create routes
-@self_serve_bp.route("create_section", methods=["GET", "POST"])
-def create_section():
+@self_serve_bp.route("section", methods=["GET", "POST"])
+def crud_section():
+    # TODO: Create frontend routes and connect to middleware
+    if request.method == "GET":
+        pass
+    if request.method == "PUT":
+        pass
+    if request.method == "DELETE":
+        pass
+
     form = SectionForm()
     if form.validate_on_submit():
         save_template_section(form.as_dict())
@@ -139,8 +147,16 @@ def create_section():
         # save to db here
     return render_template("create_section.html", available_forms=available_forms, form=form)
 
-@self_serve_bp.route("/create_form", methods=["GET", "POST"])
-def create_form():
+@self_serve_bp.route("/form", methods=["GET", "POST"])
+def crud_form():
+    # TODO: Create frontend routes and connect to middleware
+    if request.method == "GET":
+        pass
+    if request.method == "PUT":
+        pass
+    if request.method == "DELETE":
+        pass
+
     form = FormForm()
     if form.validate_on_submit():
         new_form = {
@@ -170,8 +186,16 @@ def create_form():
         )
     return render_template("create_form.html", available_pages=available_pages, form=form)
 
-@self_serve_bp.route("/create_page", methods=["GET", "POST"])
-def create_page():
+@self_serve_bp.route("/page", methods=["GET", "POST", "PUT", "DELETE"])
+def crud_page():
+    # TODO: Create frontend routes and connect to middleware
+    if request.method == "GET":
+        pass
+    if request.method == "PUT":
+        pass
+    if request.method == "DELETE":
+        pass
+
     form = PageForm()
     if form.validate_on_submit():
         new_page = {
@@ -195,8 +219,16 @@ def create_page():
     ]
     return render_template("create_page.html", form=form, available_questions=available_questions)
 
-@self_serve_bp.route("/create_question", methods=["GET", "POST"])
-def create_question():
+@self_serve_bp.route("/question", methods=["GET", "PUT", "POST" "DELETE"])
+def crud_question():
+    # TODO: Create frontend routes and connect to middleware
+    if request.method == "GET":
+        pass
+    if request.method == "PUT":
+        pass
+    if request.method == "DELETE":
+        pass
+
     form = QuestionForm()
     question = form.as_dict()
     if form.validate_on_submit():
@@ -205,41 +237,3 @@ def create_question():
         return redirect(url_for("self_serve_bp.index"))
     return render_template("create_question.html", form=form)
 
-
-
-# Edit and Delete routes
-@self_serve_bp.route("/edit_section", methods=["GET", "PUT", "DELETE"])
-def edit_section():
-    if request.method == "GET":
-        pass
-    if request.method == "PUT":
-        pass
-    if request.method == "DELETE":
-        pass
-
-@self_serve_bp.route("/edit_form", methods=["GET", "PUT", "DELETE"])
-def edit_form():
-    if request.method == "GET":
-        pass
-    if request.method == "PUT":
-        pass
-    if request.method == "DELETE":
-        pass
-
-@self_serve_bp.route("/edit_page", methods=["GET", "PUT", "DELETE"])
-def edit_page():
-    if request.method == "GET":
-        pass
-    if request.method == "PUT":
-        pass
-    if request.method == "DELETE":
-        pass
-
-@self_serve_bp.route("/edit_question", methods=["GET", "PUT", "DELETE"])
-def edit_question():
-    if request.method == "GET":
-        pass
-    if request.method == "PUT":
-        pass
-    if request.method == "DELETE":
-        pass
