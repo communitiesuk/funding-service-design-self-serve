@@ -66,11 +66,13 @@ def save_page(page: dict):
 def get_list_by_id(id: str) -> dict:
     return LISTS.get(id, None)
 
+
 # TODO Implement front end journey that can use the section/form/page/component CRUD operations
 # from app.db.queries.application import insert_new_section
 # from app.db.queries.application import insert_new_form
 # from app.db.queries.application import insert_new_page
 # from app.db.queries.application import insert_new_component
+
 
 def save_template_component(component: dict):
     """
@@ -80,7 +82,7 @@ def save_template_component(component: dict):
             component: dict    The component to save to the database as a template
         Returns:
             dict           The saved component
-    
+
     component_config = {
         "page_id": component.get("page_id"),
         "theme_id": component.get("theme_id"),
@@ -116,7 +118,6 @@ def save_template_component(component: dict):
     )
 
 
-
 def save_template_page(page: dict):
     """
     TODO:
@@ -146,7 +147,6 @@ def save_template_page(page: dict):
     PAGES.append(page)
 
 
-
 def save_template_form(form: dict):
     """
     TODO:
@@ -174,7 +174,6 @@ def save_template_form(form: dict):
     FORMS.append(form)
 
 
-
 def save_template_section(section: dict):
     """
     TODO:
@@ -183,7 +182,7 @@ def save_template_section(section: dict):
           section: dict    The section to save to the database as a template
         Returns:
             dict           The saved section
-    
+
     section_config = {
         "name_in_apply_json": {
             "en": section.get("section_display_name"),
@@ -199,5 +198,3 @@ def save_template_section(section: dict):
 
     # Temp in memory solution
     SECTIONS.append(section)
-
-

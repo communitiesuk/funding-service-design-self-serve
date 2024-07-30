@@ -15,9 +15,9 @@ from app.blueprints.self_serve.data.data_access import get_all_components
 from app.blueprints.self_serve.data.data_access import get_component_by_name
 from app.blueprints.self_serve.data.data_access import get_pages_to_display_in_builder
 from app.blueprints.self_serve.data.data_access import get_saved_forms
+from app.blueprints.self_serve.data.data_access import save_template_component
 from app.blueprints.self_serve.data.data_access import save_template_form
 from app.blueprints.self_serve.data.data_access import save_template_page
-from app.blueprints.self_serve.data.data_access import save_template_component
 from app.blueprints.self_serve.data.data_access import save_template_section
 from app.blueprints.self_serve.forms.form_form import FormForm
 from app.blueprints.self_serve.forms.page_form import PageForm
@@ -41,8 +41,6 @@ self_serve_bp = Blueprint(
 @self_serve_bp.route("/")
 def index():
     return render_template("index.html")
-
-
 
 
 @self_serve_bp.route("/download_json", methods=["POST"])
@@ -98,6 +96,7 @@ def view_form_questions():
     html = print_html(print_data)
     return render_template("view_questions.html", section_name=form_config["title"], question_html=html)
 
+
 @self_serve_bp.route("/section_questions", methods=["POST"])
 def view_section_questions():
     # form_config = generate_form_config_from_request()
@@ -116,6 +115,7 @@ def view_section_questions():
 
 
 # CRUD routes
+
 
 # Create routes
 @self_serve_bp.route("section", methods=["GET", "POST", "PUT", "DELETE"])
@@ -146,6 +146,7 @@ def section():
         )
         # save to db here
     return render_template("create_section.html", available_forms=available_forms, form=form)
+
 
 @self_serve_bp.route("/form", methods=["GET", "POST", "PUT", "DELETE"])
 def form():
@@ -186,6 +187,7 @@ def form():
         )
     return render_template("create_form.html", available_pages=available_pages, form=form)
 
+
 @self_serve_bp.route("/page", methods=["GET", "POST", "PUT", "DELETE"])
 def page():
     # TODO: Create frontend routes and connect to middleware
@@ -219,6 +221,7 @@ def page():
     ]
     return render_template("create_page.html", form=form, available_questions=available_questions)
 
+
 @self_serve_bp.route("/question", methods=["GET", "PUT", "POST", "DELETE"])
 def question():
     # TODO: Create frontend routes and connect to middleware
@@ -236,4 +239,3 @@ def question():
         flash(message=f"Question '{question['title']}' was saved")
         return redirect(url_for("self_serve_bp.index"))
     return render_template("create_question.html", form=form)
-

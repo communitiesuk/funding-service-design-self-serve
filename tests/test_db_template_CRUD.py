@@ -1,22 +1,23 @@
 import uuid
 from copy import deepcopy
-from app.db.models.application_config import Section
+
+from app.db.models import ComponentType
+from app.db.models.application_config import Component
 from app.db.models.application_config import Form
 from app.db.models.application_config import Page
-from app.db.models.application_config import Component
-from app.db.models import ComponentType
-from app.db.queries.application import insert_new_section
-from app.db.queries.application import update_section
-from app.db.queries.application import delete_section
-from app.db.queries.application import insert_new_form
-from app.db.queries.application import update_form
-from app.db.queries.application import delete_form
-from app.db.queries.application import insert_new_page
-from app.db.queries.application import update_page
-from app.db.queries.application import delete_page
-from app.db.queries.application import insert_new_component
-from app.db.queries.application import update_component
+from app.db.models.application_config import Section
 from app.db.queries.application import delete_component
+from app.db.queries.application import delete_form
+from app.db.queries.application import delete_page
+from app.db.queries.application import delete_section
+from app.db.queries.application import insert_new_component
+from app.db.queries.application import insert_new_form
+from app.db.queries.application import insert_new_page
+from app.db.queries.application import insert_new_section
+from app.db.queries.application import update_component
+from app.db.queries.application import update_form
+from app.db.queries.application import update_page
+from app.db.queries.application import update_section
 
 new_template_section_config = {
     "round_id": uuid.uuid4(),
@@ -24,23 +25,24 @@ new_template_section_config = {
     "template_name": "Template Name",
     "is_template": True,
     "audit_info": {"created_by": "John Doe", "created_at": "2022-01-01"},
-    "index": 1
+    "index": 1,
 }
 
 new_section_config = {
     "round_id": uuid.uuid4(),
     "name_in_apply_json": {"en": "Template Section Name"},
     "audit_info": {"created_by": "John Doe", "created_at": "2022-01-01"},
-    "index": 1
+    "index": 1,
 }
+
 
 def test_insert_new_section(flask_test_client, _db, clear_test_data, seed_dynamic_data):
     # Access actual round_id from seed_dynamic_data (could also be None)
-    round_id = seed_dynamic_data['rounds'][0].round_id
-    
+    round_id = seed_dynamic_data["rounds"][0].round_id
+
     # Update the configs with the round_id
-    new_template_section_config['round_id'] = round_id
-    new_section_config['round_id'] = round_id
+    new_template_section_config["round_id"] = round_id
+    new_section_config["round_id"] = round_id
 
     new_section = insert_new_section(new_section_config)
     template_section = insert_new_section(new_template_section_config)
@@ -54,7 +56,6 @@ def test_insert_new_section(flask_test_client, _db, clear_test_data, seed_dynami
     assert template_section.audit_info == new_template_section_config["audit_info"]
     assert template_section.index == new_template_section_config["index"]
 
-
     assert isinstance(new_section, Section)
     assert new_section.round_id == new_section_config["round_id"]
     assert new_section.name_in_apply_json == new_section_config["name_in_apply_json"]
@@ -64,9 +65,10 @@ def test_insert_new_section(flask_test_client, _db, clear_test_data, seed_dynami
     assert new_section.audit_info == new_section_config["audit_info"]
     assert new_section.index == new_section_config["index"]
 
+
 def test_update_section(flask_test_client, _db, clear_test_data, seed_dynamic_data):
-    round_id = seed_dynamic_data['rounds'][0].round_id
-    new_section_config['round_id'] = round_id
+    round_id = seed_dynamic_data["rounds"][0].round_id
+    new_section_config["round_id"] = round_id
     new_section = insert_new_section(new_section_config)
 
     assert new_section.round_id == new_section_config["round_id"]
@@ -79,8 +81,8 @@ def test_update_section(flask_test_client, _db, clear_test_data, seed_dynamic_da
 
     # Update new_section_config
     updated_section_config = deepcopy(new_section_config)
-    updated_section_config['name_in_apply_json'] = {"en": "Updated Section Name"}
-    updated_section_config['audit_info'] = {"created_by": "Jonny Doe", "created_at": "2024-01-02"}
+    updated_section_config["name_in_apply_json"] = {"en": "Updated Section Name"}
+    updated_section_config["audit_info"] = {"created_by": "Jonny Doe", "created_at": "2024-01-02"}
 
     updated_section = update_section(new_section.section_id, updated_section_config)
     # write assertions for updated_section
@@ -89,17 +91,43 @@ def test_update_section(flask_test_client, _db, clear_test_data, seed_dynamic_da
     assert updated_section.name_in_apply_json == updated_section_config["name_in_apply_json"]
     assert updated_section.audit_info == updated_section_config["audit_info"]
 
+
 def test_delete_section(flask_test_client, _db, clear_test_data, seed_dynamic_data):
-    round_id = seed_dynamic_data['rounds'][0].round_id
-    new_section_config['round_id'] = round_id
+    round_id = seed_dynamic_data["rounds"][0].round_id
+    new_section_config["round_id"] = round_id
     new_section = insert_new_section(new_section_config)
 
     assert isinstance(new_section, Section)
     assert new_section.audit_info == new_section_config["audit_info"]
 
-
     delete_section(new_section.section_id)
     assert _db.session.query(Section).filter(Section.section_id == new_section.section_id).one_or_none() == None
+
+
+from sqlalchemy.exc import IntegrityError
+
+
+def test_failed_delete_section_with_fk_to_forms(flask_test_client, _db, clear_test_data, seed_dynamic_data):
+    new_section_config["round_id"] = None
+    section = insert_new_section(new_section_config)
+    # CREATE FK link to Form
+    new_form_config["section_id"] = section.section_id
+    form = insert_new_form(new_form_config)
+    # check inserted form has same section_id
+    assert form.section_id == section.section_id
+    assert isinstance(section, Section)
+    assert section.audit_info == new_section_config["audit_info"]
+
+    try:
+        delete_section(form.section_id)
+        assert False, "Expected IntegrityError was not raised"
+    except IntegrityError:
+        _db.session.rollback()  # Rollback the failed transaction to maintain DB integrity
+        assert True  # Explicitly pass the test to indicate the expected error was caught
+
+    existing_section = _db.session.query(Section).filter(Section.section_id == section.section_id).one_or_none()
+    assert existing_section is not None, "Section was unexpectedly deleted"
+
 
 new_form_config = {
     "section_id": uuid.uuid4(),
@@ -107,7 +135,7 @@ new_form_config = {
     "is_template": False,
     "audit_info": {"created_by": "John Doe", "created_at": "2022-01-01"},
     "section_index": 1,
-    "runner_publish_name": "test-form"
+    "runner_publish_name": "test-form",
 }
 
 new_template_form_config = {
@@ -117,15 +145,17 @@ new_template_form_config = {
     "is_template": True,
     "audit_info": {"created_by": "John Doe", "created_at": "2022-01-01"},
     "section_index": 1,
-    "runner_publish_name": None # This is a template
+    "runner_publish_name": None,  # This is a template
 }
+
+
 def test_insert_new_form(flask_test_client, _db, clear_test_data, seed_dynamic_data):
-    round_id = seed_dynamic_data['rounds'][0].round_id
-    new_section_config['round_id'] = round_id
+    round_id = seed_dynamic_data["rounds"][0].round_id
+    new_section_config["round_id"] = round_id
     new_section = insert_new_section(new_section_config)
     # Point to a section that exists in the db
-    new_form_config["section_id"] = new_section.section_id # *Does not need to belong to a section
-    new_template_form_config["section_id"] = new_section.section_id # *Does not need to belong to a section
+    new_form_config["section_id"] = new_section.section_id  # *Does not need to belong to a section
+    new_template_form_config["section_id"] = new_section.section_id  # *Does not need to belong to a section
 
     new_template_form = insert_new_form(new_template_form_config)
     assert isinstance(new_template_form, Form)
@@ -138,26 +168,25 @@ def test_insert_new_form(flask_test_client, _db, clear_test_data, seed_dynamic_d
     assert new_template_form.section_index == new_template_form_config["section_index"]
     assert new_template_form.runner_publish_name == None
 
-
     new_form = insert_new_form(new_form_config)
     assert isinstance(new_form, Form)
     assert new_form.section_id == new_form_config["section_id"]
     assert new_form.name_in_apply_json == new_form_config["name_in_apply_json"]
     assert new_form.template_name == None
-    assert new_form.source_template_id == None # not cloned, its a new non-template form
+    assert new_form.source_template_id == None  # not cloned, its a new non-template form
     assert new_form.is_template == False
     assert new_form.audit_info == new_form_config["audit_info"]
     assert new_form.section_index == new_form_config["section_index"]
-    assert new_form.runner_publish_name== new_form_config["runner_publish_name"]
+    assert new_form.runner_publish_name == new_form_config["runner_publish_name"]
 
-
-    new_form_config['section_index'] = 2
+    new_form_config["section_index"] = 2
     new_form = insert_new_form(new_form_config)
     assert new_form.section_index == new_form_config["section_index"]
 
+
 def test_update_form(flask_test_client, _db, clear_test_data, seed_dynamic_data):
-    round_id = seed_dynamic_data['rounds'][0].round_id
-    new_section_config['round_id'] = round_id
+    round_id = seed_dynamic_data["rounds"][0].round_id
+    new_section_config["round_id"] = round_id
     new_section = insert_new_section(new_section_config)
     new_form_config["section_id"] = new_section.section_id
     new_form = insert_new_form(new_form_config)
@@ -173,19 +202,20 @@ def test_update_form(flask_test_client, _db, clear_test_data, seed_dynamic_data)
 
     # Update new_form_config
     updated_form_config = deepcopy(new_form_config)
-    updated_form_config['name_in_apply_json'] = {"en": "Updated Form Name"}
-    updated_form_config['audit_info'] = {"created_by": "Jonny Doe", "created_at": "2024-01-02"}
+    updated_form_config["name_in_apply_json"] = {"en": "Updated Form Name"}
+    updated_form_config["audit_info"] = {"created_by": "Jonny Doe", "created_at": "2024-01-02"}
 
     updated_form = update_form(new_form.form_id, updated_form_config)
-    
+
     assert isinstance(updated_form, Form)
     assert updated_form.section_id == updated_form_config["section_id"]
     assert updated_form.name_in_apply_json == updated_form_config["name_in_apply_json"]
     assert updated_form.audit_info == updated_form_config["audit_info"]
 
+
 def test_delete_form(flask_test_client, _db, clear_test_data, seed_dynamic_data):
-    round_id = seed_dynamic_data['rounds'][0].round_id
-    new_section_config['round_id'] = round_id
+    round_id = seed_dynamic_data["rounds"][0].round_id
+    new_section_config["round_id"] = round_id
     new_section = insert_new_section(new_section_config)
     new_form_config["section_id"] = new_section.section_id
     new_form = insert_new_form(new_form_config)
@@ -197,6 +227,24 @@ def test_delete_form(flask_test_client, _db, clear_test_data, seed_dynamic_data)
     assert _db.session.query(Form).filter(Form.form_id == new_form.form_id).one_or_none() == None
 
 
+def test_failed_delete_form_with_fk_to_page(flask_test_client, _db, clear_test_data, seed_dynamic_data):
+    new_form_config["section_id"] = None
+    form = insert_new_form(new_form_config)
+    # CREATE FK link to Form
+    new_page_config["form_id"] = form.form_id
+    page = insert_new_page(new_page_config)
+
+    try:
+        delete_form(page.form_id)
+        assert False, "Expected IntegrityError was not raised"
+    except IntegrityError:
+        _db.session.rollback()  # Rollback the failed transaction to maintain DB integrity
+        assert True  # Explicitly pass the test to indicate the expected error was caught
+
+    existing_form = _db.session.query(Form).filter(Form.form_id == form.form_id).one_or_none()
+    assert existing_form is not None, "Form was unexpectedly deleted"
+
+
 new_page_config = {
     "form_id": uuid.uuid4(),
     "name_in_apply_json": {"en": "Page Name"},
@@ -206,7 +254,7 @@ new_page_config = {
     "audit_info": {"created_by": "John Doe", "created_at": "2022-01-01"},
     "form_index": 1,
     "display_path": "test-page",
-    "controller": "./test-controller"
+    "controller": "./test-controller",
 }
 
 new_template_page_config = {
@@ -218,16 +266,17 @@ new_template_page_config = {
     "audit_info": {"created_by": "John Doe", "created_at": "2022-01-01"},
     "form_index": 1,
     "display_path": "test-page",
-    "controller": None
+    "controller": None,
 }
 
+
 def test_insert_new_page(flask_test_client, _db, clear_test_data, seed_dynamic_data):
-    
+
     new_form_config["section_id"] = None
     new_form = insert_new_form(new_form_config)
 
-    new_page_config["form_id"] = new_form.form_id # *Does not need to belong to a form
-    new_template_page_config["form_id"] = None # *Does not need to belong to a form
+    new_page_config["form_id"] = new_form.form_id  # *Does not need to belong to a form
+    new_template_page_config["form_id"] = None  # *Does not need to belong to a form
 
     new_template_page = insert_new_page(new_template_page_config)
     assert isinstance(new_template_page, Page)
@@ -253,6 +302,7 @@ def test_insert_new_page(flask_test_client, _db, clear_test_data, seed_dynamic_d
     assert new_page.display_path == new_page_config["display_path"]
     assert new_page.controller == new_page_config["controller"]
 
+
 def test_update_page(flask_test_client, _db, clear_test_data, seed_dynamic_data):
     new_page_config["form_id"] = None
     new_page = insert_new_page(new_page_config)
@@ -269,15 +319,16 @@ def test_update_page(flask_test_client, _db, clear_test_data, seed_dynamic_data)
 
     # Update new_page_config
     updated_page_config = deepcopy(new_page_config)
-    updated_page_config['name_in_apply_json'] = {"en": "Updated Page Name"}
-    updated_page_config['audit_info'] = {"created_by": "Jonny Doe", "created_at": "2024-01-02"}
+    updated_page_config["name_in_apply_json"] = {"en": "Updated Page Name"}
+    updated_page_config["audit_info"] = {"created_by": "Jonny Doe", "created_at": "2024-01-02"}
 
     updated_page = update_page(new_page.page_id, updated_page_config)
-    
+
     assert isinstance(updated_page, Page)
     assert updated_page.form_id == updated_page_config["form_id"]
     assert updated_page.name_in_apply_json == updated_page_config["name_in_apply_json"]
     assert updated_page.audit_info == updated_page_config["audit_info"]
+
 
 def test_delete_page(flask_test_client, _db, clear_test_data, seed_dynamic_data):
     new_page_config["form_id"] = None
@@ -288,6 +339,31 @@ def test_delete_page(flask_test_client, _db, clear_test_data, seed_dynamic_data)
 
     delete_page(new_page.page_id)
     assert _db.session.query(Page).filter(Page.page_id == new_page.page_id).one_or_none() == None
+
+
+def test_failed_delete_page_with_fk_to_component(flask_test_client, _db, clear_test_data, seed_dynamic_data):
+    new_page_config["form_id"] = None
+    new_page = insert_new_page(new_page_config)
+    # CREATE FK link to Component
+    new_component_config["page_id"] = new_page.page_id
+    new_component_config["list_id"] = None
+    new_component_config["theme_id"] = None
+    component = insert_new_component(new_component_config)
+    # check inserted component has same page_id
+    assert component.page_id == new_page.page_id
+    assert isinstance(new_page, Page)
+    assert new_page.audit_info == new_page_config["audit_info"]
+
+    try:
+        delete_page(component.page_id)
+        assert False, "Expected IntegrityError was not raised"
+    except IntegrityError:
+        _db.session.rollback()  # Rollback the failed transaction to maintain DB integrity
+        assert True  # Explicitly pass the test to indicate the expected error was caught
+
+    existing_page = _db.session.query(Page).filter(Page.page_id == new_page.page_id).one_or_none()
+    assert existing_page is not None, "Page was unexpectedly deleted"
+
 
 new_component_config = {
     "page_id": uuid.uuid4(),
@@ -303,21 +379,21 @@ new_component_config = {
     "page_index": 1,
     "theme_index": 1,
     "conditions": [
-            {
-                "name": "organisation_other_names_no",
-                "value": "false",  # this must be lowercaes or the navigation doesn't work
-                "operator": "is",
-                "destination_page_path": "CONTINUE",
-            },
-            {
-                "name": "organisation_other_names_yes",
-                "value": "true",  # this must be lowercaes or the navigation doesn't work
-                "operator": "is",
-                "destination_page_path": "organisation-alternative-names",
-            },
-        ],
+        {
+            "name": "organisation_other_names_no",
+            "value": "false",  # this must be lowercaes or the navigation doesn't work
+            "operator": "is",
+            "destination_page_path": "CONTINUE",
+        },
+        {
+            "name": "organisation_other_names_yes",
+            "value": "true",  # this must be lowercaes or the navigation doesn't work
+            "operator": "is",
+            "destination_page_path": "organisation-alternative-names",
+        },
+    ],
     "runner_component_name": "test-component",
-    "list_id": uuid.uuid4()
+    "list_id": uuid.uuid4(),
 }
 
 
@@ -335,27 +411,28 @@ new_template_component_config = {
     "page_index": 1,
     "theme_index": 2,
     "conditions": [
-            {
-                "name": "path_start_no",
-                "value": "false",  # this must be lowercaes or the navigation doesn't work
-                "operator": "is",
-                "destination_page_path": "path-1",
-            },
-            {
-                "name": "path_start_yes",
-                "value": "true",  # this must be lowercaes or the navigation doesn't work
-                "operator": "is",
-                "destination_page_path": "path-2",
-            },
-        ],
+        {
+            "name": "path_start_no",
+            "value": "false",  # this must be lowercaes or the navigation doesn't work
+            "operator": "is",
+            "destination_page_path": "path-1",
+        },
+        {
+            "name": "path_start_yes",
+            "value": "true",  # this must be lowercaes or the navigation doesn't work
+            "operator": "is",
+            "destination_page_path": "path-2",
+        },
+    ],
     "runner_component_name": "test-component",
-    "list_id": uuid.uuid4()
+    "list_id": uuid.uuid4(),
 }
 
+
 def test_insert_new_component(flask_test_client, _db, clear_test_data, seed_dynamic_data):
-    page_id = seed_dynamic_data['pages'][0].page_id
-    list_id = seed_dynamic_data['lists'][0].list_id
-    theme_id = seed_dynamic_data['themes'][0].theme_id
+    page_id = seed_dynamic_data["pages"][0].page_id
+    list_id = seed_dynamic_data["lists"][0].list_id
+    theme_id = seed_dynamic_data["themes"][0].theme_id
     new_component_config["page_id"] = page_id
     new_template_component_config["page_id"] = None
     new_component_config["list_id"] = list_id
@@ -401,9 +478,9 @@ def test_insert_new_component(flask_test_client, _db, clear_test_data, seed_dyna
 
 
 def test_update_component(flask_test_client, _db, clear_test_data, seed_dynamic_data):
-    page_id = seed_dynamic_data['pages'][0].page_id
-    list_id = seed_dynamic_data['lists'][0].list_id
-    theme_id = seed_dynamic_data['themes'][0].theme_id
+    page_id = seed_dynamic_data["pages"][0].page_id
+    list_id = seed_dynamic_data["lists"][0].list_id
+    theme_id = seed_dynamic_data["themes"][0].theme_id
     new_component_config["page_id"] = page_id
     new_component_config["list_id"] = list_id
     new_component_config["theme_id"] = theme_id
@@ -416,20 +493,21 @@ def test_update_component(flask_test_client, _db, clear_test_data, seed_dynamic_
 
     # Update new_component_config
     updated_component_config = deepcopy(new_component_config)
-    updated_component_config['title'] = "Updated Component Title"
-    updated_component_config['audit_info'] = {"created_by": "Adam Doe", "created_at": "2024-01-02"}
+    updated_component_config["title"] = "Updated Component Title"
+    updated_component_config["audit_info"] = {"created_by": "Adam Doe", "created_at": "2024-01-02"}
 
     updated_component = update_component(component.component_id, updated_component_config)
-    
+
     assert isinstance(updated_component, Component)
     assert updated_component.title == updated_component_config["title"]
     assert updated_component.audit_info == updated_component_config["audit_info"]
     assert updated_component.is_template == False
 
+
 def test_delete_component(flask_test_client, _db, clear_test_data, seed_dynamic_data):
-    page_id = seed_dynamic_data['pages'][0].page_id
-    list_id = seed_dynamic_data['lists'][0].list_id
-    theme_id = seed_dynamic_data['themes'][0].theme_id
+    page_id = seed_dynamic_data["pages"][0].page_id
+    list_id = seed_dynamic_data["lists"][0].list_id
+    theme_id = seed_dynamic_data["themes"][0].theme_id
     new_component_config["page_id"] = page_id
     new_component_config["list_id"] = list_id
     new_component_config["theme_id"] = theme_id
