@@ -25,22 +25,22 @@ from app.db.queries.application import get_form_for_component
 # }
 
 
-# def generate_field_info_from_forms(forms_dir: str) -> dict:
-#     """Generates the display info for all fields in a form
+def generate_field_info_from_forms(forms_dir: str) -> dict:
+    """Generates the display info for all fields in a form
 
-#     Args:
-#         forms_dir (str): Directory containing the forms
+    Args:
+        forms_dir (str): Directory containing the forms
 
-#     Returns:
-#         dict: Dictionary of field IDs to display info
-#     """
-#     results = {}
-#     for file_name in os.listdir(forms_dir):
-#         with open(os.path.join(forms_dir, file_name), "r") as f:
-#             form_data = json.load(f)
-#             results.update(build_answers_from_form(form_data, file_name.split(".")[0]))
+    Returns:
+        dict: Dictionary of field IDs to display info
+    """
+    results = {}
+    for file_name in os.listdir(forms_dir):
+        with open(os.path.join(forms_dir, file_name), "r") as f:
+            form_data = json.load(f)
+            results.update(build_answers_from_form(form_data, file_name.split(".")[0]))
 
-#     return results
+    return results
 
 
 def build_answers_from_form(form_data: dict, form_name: str) -> dict:
@@ -71,7 +71,8 @@ def build_answers_from_form(form_data: dict, form_name: str) -> dict:
                 "field_id": component["name"],
                 "form_name": form_name,
                 "field_type": component["type"],
-                # TODO fix this "presentation_type": form_json_to_assessment_display_types.get(component["type"].lower(), None),
+                # TODO fix this "presentation_type":
+                # form_json_to_assessment_display_types.get(component["type"].lower(), None),
                 "question": question,
             }
 

@@ -1,4 +1,4 @@
-from app.question_reuse.generate_assessment_config import build_assessment_config
+from app.config_reuse.generate_assessment_config import build_assessment_config
 from tests.unit_test_data import cri1
 from tests.unit_test_data import crit_1_id
 from tests.unit_test_data import mock_form_1

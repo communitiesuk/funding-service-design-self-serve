@@ -2,18 +2,17 @@ from uuid import uuid4
 
 import pytest
 
+# from app.question_reuse.generate_form import build_conditions
+from app.config_reuse.generate_form import build_conditions
+from app.config_reuse.generate_form import build_form_json
+from app.config_reuse.generate_form import build_lists
+from app.config_reuse.generate_form import build_navigation
+from app.config_reuse.generate_form import build_page
+from app.config_reuse.generate_form import human_to_kebab_case
 from app.db.models import Component
 from app.db.models import ComponentType
 from app.db.models import Lizt
 from app.db.models import Page
-
-# from app.question_reuse.generate_form import build_conditions
-from app.question_reuse.generate_form import build_conditions
-from app.question_reuse.generate_form import build_form_json
-from app.question_reuse.generate_form import build_lists
-from app.question_reuse.generate_form import build_navigation
-from app.question_reuse.generate_form import build_page
-from app.question_reuse.generate_form import human_to_kebab_case
 from tests.unit_test_data import mock_c_1
 from tests.unit_test_data import mock_form_1
 

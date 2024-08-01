@@ -7,10 +7,9 @@ Having reusable questions also means we can have reusable assessment config - eg
 
 ## Reusable configuration
 [Components](./config/components_to_reuse.py) Configuration for individual components (fields). Structure is as in the form json, except for conditions which are simplified
-[Pages](./config/pages_to_reuse.py) Configuration for pages that can be inserted into forms. Basically each page is a list of component IDs that existin in `components_to_reuse.py` above.
-[Lookups](./config/lookups.py) General place to convert from an ID to a display string, eg. organisation_information to Organisation information
-[Sub Pages](./config/sub_pages_to_reuse.py) Contains full form json info for some pages that are constant when reused, eg. the summary page. But also ones that are needed for sub flows based on conditions - eg. the 'what alternative names does your org use' page is in here, as it will always be required if you add the component `reuse_organisation_other_names_yes_no`
-[Assessment Themes](./config/themes_to_reuse.py) Specifies themes that can be reused across assessments, basically a list of the components in each theme. These component names are the same as in `components_to_reuse.py`
+[Pages](./config/pages_to_reuse.py) Configuration for pages that can be inserted into forms. Basically each page is a list of component IDs that exist in `components_to_reuse.py` above.
+<!-- [Sub Pages](./config/sub_pages_to_reuse.py) Contains full form json info for some pages that are constant when reused, eg. the summary page. But also ones that are needed for sub flows based on conditions - eg. the 'what alternative names does your org use' page is in here, as it will always be required if you add the component `reuse_organisation_other_names_yes_no`
+[Assessment Themes](./config/themes_to_reuse.py) Specifies themes that can be reused across assessments, basically a list of the components in each theme. These component names are the same as in `components_to_reuse.py` -->
 
 ## Example inputs - Forms
 These are examples of the inputs required from a fund to create forms based on reusable components. Once the form json is generated, it can always be edited to add non-reusable components/pages as well.
