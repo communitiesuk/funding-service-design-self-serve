@@ -58,7 +58,7 @@ inv generate-round-html {roundid}
 
 ## Output
 The scripts generate the following output file structure:
-"""
+```plaintext
 app/
     config_generator/
         - scripts/
@@ -73,7 +73,7 @@ app/
                 -- sections_config.py
             -- html/
                 -- full_aplication.html
-"""
+```
 
 <!-- TODO: Is this now covered by cloning? >> -->
 <!-- # SPIKE to look at Question Bank and answer config_reuse -->
