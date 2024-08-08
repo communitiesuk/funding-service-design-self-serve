@@ -2,8 +2,10 @@ from uuid import uuid4
 
 import pytest
 
-from app.config_reuse.generate_assessment_config import build_assessment_config
-from app.config_reuse.generate_form import build_form_json
+from app.config_generator.generate_form import build_form_json
+from app.config_generator.scripts.generate_assessment_config import (
+    build_assessment_config,
+)
 from app.db.models import Component
 from app.db.models import ComponentType
 from app.db.models import Form

@@ -159,7 +159,7 @@ def build_assessment_config(criteria_list: list[Criteria]) -> dict:
 @click.command()
 @click.option(
     "--input_folder",
-    default="./question_reuse/test_data/in/",
+    default="./config_reuse/test_data/in/",
     help="Input configuration",
     prompt=True,
 )
@@ -171,7 +171,7 @@ def build_assessment_config(criteria_list: list[Criteria]) -> dict:
 )
 @click.option(
     "--output_folder",
-    default="./question_reuse/test_data/out",
+    default="./config_reuse/test_data/out",
     help="Output destination",
     prompt=True,
 )
@@ -183,7 +183,7 @@ def build_assessment_config(criteria_list: list[Criteria]) -> dict:
 )
 @click.option(
     "--forms_dir",
-    default="./question_reuse/test_data/out/forms/",
+    default="./config_reuse/test_data/out/forms/",
     help="Directory containing forms",
     prompt=True,
 )
