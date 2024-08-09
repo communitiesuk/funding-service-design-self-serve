@@ -1,5 +1,6 @@
+from flask import current_app
+
 from app.all_questions.metadata_utils import generate_print_data_for_sections
-from app.app import app
 from app.config_generator.generate_all_questions import print_html
 from app.config_generator.generate_form import build_form_json
 from app.config_generator.scripts.helpers import write_config
@@ -31,7 +32,7 @@ def generate_all_round_html(round_id):
     """
     if not round_id:
         raise ValueError("Round ID is required to generate HTML.")
-    app.logger.info(f"Generating HTML for round {round_id}.")
+    current_app.logger.info(f"Generating HTML for round {round_id}.")
     round = get_round_by_id(round_id)
     sections_in_round = round.sections
     section_data = []

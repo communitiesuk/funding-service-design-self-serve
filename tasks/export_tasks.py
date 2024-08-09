@@ -67,7 +67,7 @@ def publish_form_json_to_runner(c, filename):
         ] = f"http://{Config.FAB_HOST}{Config.FAB_SAVE_PER_PAGE}"
         try:
             publish_response = requests.post(
-                url="http://localhost:3009/publish",
+                url=f"{Config.FORM_RUNNER_URL}/publish",
                 json={"id": human_to_kebab_case(form_dict["name"]), "configuration": form_dict},
             )
             if not str(publish_response.status_code).startswith("2"):

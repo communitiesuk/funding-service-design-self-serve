@@ -4,7 +4,8 @@ from dataclasses import field
 from typing import Dict
 from typing import Optional
 
-from app.app import app
+from flask import current_app
+
 from app.config_generator.scripts.helpers import write_config
 from app.db import db
 from app.db.models import Form
@@ -12,6 +13,8 @@ from app.db.models import Section
 from app.db.queries.fund import get_fund_by_id
 from app.db.queries.round import get_round_by_id
 
+# TODO : The Round path might be better as a placeholder to avoid conflict in the actual fund store.
+# Decide on this further down the line.
 ROUND_BASE_PATHS = {
     # Should increment for each new round, anything that shares the same base path will also share
     # the child tree path config.
@@ -66,7 +69,7 @@ def generate_application_display_config(round_id):
     round_base_path = ROUND_BASE_PATHS[round.short_name]
     "sort by Section.index"
     sections = db.session.query(Section).filter(Section.round_id == round_id).order_by(Section.index).all()
-    app.logger.info(f"Generating application display config for round {round_id}")
+    current_app.logger.info(f"Generating application display config for round {round_id}")
 
     for original_section in sections:
         section = copy.deepcopy(original_section)
@@ -192,7 +195,7 @@ def generate_fund_config(round_id):
     round = get_round_by_id(round_id)
     fund_id = round.fund_id
     fund = get_fund_by_id(fund_id)
-    app.logger.info(f"Generating fund config for fund {fund_id}")
+    current_app.logger.info(f"Generating fund config for fund {fund_id}")
 
     fund_export = FundExport(
         id=str(fund.fund_id),
@@ -210,7 +213,7 @@ def generate_fund_config(round_id):
 
 def generate_round_config(round_id):
     round = get_round_by_id(round_id)
-    app.logger.info(f"Generating round config for round {round_id}")
+    current_app.logger.info(f"Generating round config for round {round_id}")
 
     round_export = RoundExport(
         id=str(round.round_id),

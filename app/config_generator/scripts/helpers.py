@@ -3,6 +3,10 @@ from dataclasses import asdict
 from dataclasses import is_dataclass
 from datetime import date
 
+import jsonschema
+from flask import current_app
+from jsonschema import validate
+
 from app.blueprints.self_serve.routes import human_to_kebab_case
 from app.blueprints.self_serve.routes import human_to_snake_case
 
@@ -45,3 +49,15 @@ def write_config(config, filename, round_short_name, config_type):
             print(content_to_write, file=f)  # Print the dictionary for non-JSON types
         elif config_type == "html":
             f.write(content_to_write)
+
+
+# Function to validate JSON data against the schema
+def validate_json(data, schema):
+    try:
+        validate(instance=data, schema=schema)
+        current_app.logger.info("Given JSON data is valid")
+        return True
+    except jsonschema.exceptions.ValidationError as err:
+        current_app.logger.error("Given JSON data is invalid")
+        current_app.logger.error(err)
+        return False
