@@ -29,7 +29,7 @@ ROUND_BASE_PATHS = {
     "COF_R4_W1": 9,
     "HSRA": 10,
     "COF_R4_W2": 11,
-    "R374": 12,
+    "R605": 12,
 }
 
 
